@@ -18,6 +18,11 @@ Eclair.configure do |config|
     end
   end
 
+  # ssh_keys - Hash of key_name => key_path in local.
+  # If your key has been already registered in ssh-agent, you don't have to configure this.
+  config.ssh_keys = {
+  }
+
   # group_by - Function to find group name from instance.
   # Make a function that returns group name from instance data
   # You can access response data extracted from EC2::Client#describe_instances API call

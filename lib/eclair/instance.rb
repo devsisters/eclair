@@ -71,9 +71,17 @@ module Eclair
       config.ssh_username.call(image(force: true))
     end
 
+    def key_cmd
+      if config.ssh_keys[key_name]
+        "-i #{config.ssh_keys[key_name]}"
+      else
+        ""
+      end
+    end
+
     def ssh_cmd
       cmd = config.ssh_ports.map{ |port|
-        "ssh #{config.ssh_options} -p#{port} #{username}@#{hostname}"
+        "ssh #{config.ssh_options} -p#{port} #{key_cmd} #{username}@#{hostname}"
       }.join(" || ")
 
       "echo Attaching to #{name}: #{username}@#{hostname} && (#{cmd})"

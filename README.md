@@ -98,6 +98,16 @@ Choose from :public_dns_name, :public_ip_address, :private_dns_name, :private_ip
 	
 	config.ssh_hostname = :public_ip_address
 
+
+### ssh_keys
+Hash of EC2 keypair name => key_path in local.
+If your key has been already registered in ssh-agent, you don't have to configure this.
+
+  config.ssh_keys = {
+    "keypair1" => "/path/to/key1",
+    "keypair2" => "/path/to/key2",
+  }
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
