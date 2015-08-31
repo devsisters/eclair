@@ -32,6 +32,7 @@ module Eclair
       @disabled_color       = [COLOR_BLACK, -1, A_BOLD].freeze
       @search_color         = [COLOR_BLACK, COLOR_YELLOW].freeze
       @help_color           = [COLOR_BLACK, COLOR_WHITE].freeze
+      @view_mode            = :ec2_mode
 
       instance_variables.each do |var|
         Config.class_eval do

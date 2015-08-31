@@ -53,6 +53,16 @@ module Eclair
       end
     end
 
+    def elbs **options
+      if Aws.elbs?
+        Aws.elbs(**options).select do |elb|
+          elb.instances.find{|i| i.instance_id == object.instance_id }
+        end
+      else
+        nil
+      end
+    end
+
     def routes
       if Aws.dns_records?
         Aws.dns_records.select do |record| 
@@ -125,8 +135,16 @@ module Eclair
       end
     end
 
+    def digest_elbs
+      if Aws.elbs?
+        elbs.map(&:load_balancer_name).join(",")
+      else
+        "..."
+      end
+    end
+
     def header
-      ["#{name} (#{instance_id}) [#{state[:name]}] #{hostname}",
+      ["#{name} (#{instance_id}) [#{state[:name]}] #{hostname}   | attached at #{digest_elbs}",
       "launched at #{launch_time.to_time}",
       "#{digest_routes}"]
     end
