@@ -36,7 +36,16 @@ module Eclair
     end
 
     def hostname
-      object.send(config.ssh_hostname)
+      case config.ssh_hostname
+      when :auto
+        if object.network_interfaces.empty? && object.public_ip_address
+          object.public_ip_address
+        else
+          object.private_ip_address
+        end
+      else
+        object.send(config.ssh_hostname)
+      end
     end
 
     def image **options
