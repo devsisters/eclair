@@ -10,6 +10,10 @@ module Eclair
       @route53 ||= ::Aws::Route53::Client.new
     end
 
+    def elb
+      @elb ||= ::Aws::ElasticLoadBalancing::Client.new
+    end
+
     def instances
       fetch_all unless @instances
       @instances
@@ -52,6 +56,17 @@ module Eclair
       !@security_groups_thread.alive?
     end
 
+    def elbs **options
+      if options.delete :force
+        @elbs_thread.join
+      end
+      @elbs || []
+    end
+
+    def elbs?
+      !@elbs_thread.alive?
+    end
+
     def reload_instances
       return if @reload_thread && @reload_thread.alive?
 
@@ -61,6 +76,7 @@ module Eclair
         @images += @new_images
         @dns_records = @r_dns_records
         @security_groups = @r_security_groups
+        @elbs = @r_elbs
         Grid.assign
         @reload_thread = nil
       end
@@ -81,6 +97,10 @@ module Eclair
 
             Thread.new do
               @r_security_groups = fetch_security_groups
+            end,
+
+            Thread.new do
+              @r_elbs = fetch_elbs
             end
           ].each(&:join)
         end
@@ -106,6 +126,12 @@ module Eclair
     def fetch_security_groups
       ec2.describe_security_groups.map{ |resp|
         resp.security_groups
+      }.flatten
+    end
+
+    def fetch_elbs
+      elb.describe_load_balancers.map{ |resp|
+        resp.load_balancer_descriptions
       }.flatten
     end
 
@@ -148,6 +174,11 @@ module Eclair
       @threads << @security_groups_thread = Thread.new do
         @security_groups = fetch_security_groups
       end
+
+      @threads << @elbs_thread = Thread.new do
+        @elbs = fetch_elbs
+      end
+
     end
     
     def find_username image_id

@@ -61,26 +61,38 @@ module Eclair
     end
 
     def assign
+      if config.view_mode == :ec2_mode
+        assign_ec2
+      elsif config.view_mode == :ec2_elb_mode
+        assign_ec2_elb
+      end
+    end
+
+    def place_instances group, instances
       sort_function = lambda {|i| [i.name.downcase, -i.launch_time.to_i]}
       @group_map ||= {}
-      if config.group_by
-        Aws.instances.group_by(&config.group_by).each do |group, instances|
-          if @group_map[group]
-            group_cell  = @group_map[group]
-          else
-            col = columns[target_col]
-            group_cell = Group.new(group, col)
-            col << group_cell
-            @group_map[group] = group_cell
-          end
-          instances.each do |i|
-            unless group_cell.find{|j| j.instance_id == i.instance_id}
-              obj = Instance.new(i.instance_id, col)
-              group_cell << obj
-            end
-          end
-          group_cell.items.sort_by!(&sort_function)
+
+      if @group_map[group]
+        group_cell = @group_map[group]
+      else
+        col = columns[target_col]
+        group_cell = Group.new(group, col)
+        col << group_cell
+        @group_map[group] = group_cell
+      end
+      instances.each do |i|
+        unless group_cell.find{|j| j.instance_id == i.instance_id}
+          obj = Instance.new(i.instance_id, col)
+          group_cell << obj
         end
+      end
+      group_cell.items.sort_by!(&sort_function)
+    end
+
+    def assign_ec2
+      sort_function = lambda {|i| [i.name.downcase, -i.launch_time.to_i]}
+      if config.group_by
+        Aws.instances.group_by(&config.group_by).each do |group, instances| place_instances(group, instances) end
       else
         col_limit = (Aws.instances.count - 1) / config.columns + 1
         iter = Aws.instances.map{|i| Instance.new(i.instance_id)}.sort_by(&sort_function).each
@@ -96,6 +108,13 @@ module Eclair
           end
         end
       end
+    end
+
+    def assign_ec2_elb
+      Aws.instances
+      Aws.elbs(force: true).sort_by(&:load_balancer_name).each { |elb|
+        place_instances(elb.load_balancer_name, elb.instances.map{|i| Instance.new(i.instance_id)})
+      }
     end
 
     def render_all
