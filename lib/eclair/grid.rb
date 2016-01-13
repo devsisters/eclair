@@ -120,26 +120,28 @@ module Eclair
         cmd = target.ssh_cmd
       else
         cmds = []
-        session_name = nil
-        session_cmd = nil
+        target_cmd = ""
 
         targets.each_with_index do |target, i|
-          if i==0
-            if ENV['TMUX']
-              cmds << "tmux new-window -- '#{target.ssh_cmd}'"
-            else
+          if i == 0 
+            if ENV['TMUX'] # Eclair called inside of tmux
+              # Create new session and save window id
+              window_name = `tmux new-window -P -- '#{target.ssh_cmd}'`.strip
+              target_cmd = "-t #{window_name}"
+            else # Eclair called from outside of tmux
+              # Create new session and save session
               session_name = "eclair#{Time.now.to_i}"
-              session_cmd = "-t #{session_name}"
-              cmds << "tmux new-session -d -s #{session_name} -- '#{target.ssh_cmd}'"
+              target_cmd = "-t #{session_name}"
+              `tmux new-session -d -s #{session_name} -- '#{target.ssh_cmd}'`
             end
-          else
-            cmds << "tmux split-window #{session_cmd} -- '#{target.ssh_cmd}'"
-            cmds << "tmux select-layout #{session_cmd} tiled"
+          else # Split layout and 
+            cmds << "split-window #{target_cmd} -- '#{target.ssh_cmd}'"
+            cmds << "select-layout #{target_cmd} tiled"
           end
         end
-        cmds << "tmux set-window-option #{session_cmd} synchronize-panes on" 
-        cmds << "tmux attach #{session_cmd}" unless ENV['TMUX']
-        cmd = cmds.join(" && ")
+        cmds << "set-window-option #{target_cmd} synchronize-panes on" 
+        cmds << "attach #{target_cmd}" unless ENV['TMUX']
+        cmd = "tmux #{cmds.join(" \\; ")}"
       end
       system cmd
       exit
