@@ -1,6 +1,6 @@
 module Eclair
   class Config
-    RCFILE = ENV["ECLRC"] || "#{ENV['HOME']}/.eclrc"
+    CONFIG_FILE = ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
     include Curses
 
     def initialize
@@ -39,10 +39,24 @@ module Eclair
         end
       end
 
-      unless File.exists? RCFILE
+      # Migrate old ~/.eclrc to ~/.ecl/config.rb
+      old_conf  = "#{ENV['HOME']}/.eclrc"
+      new_dir = "#{ENV['HOME']}/.ecl"
+      new_conf  = "#{ENV['HOME']}/.ecl/config.rb"
+
+      if !File.exists?(new_conf) && File.exists?(old_conf)
+        FileUtils.mkdir_p new_dir
+        FileUtils.mv old_conf, new_conf
+        puts "#{old_conf} migrated to #{new_conf}"
+        puts "Please re-run eclair"
+        exit
+      end
+
+      unless File.exists? CONFIG_FILE
         template_path = File.join(File.dirname(__FILE__), "..", "..", "templates", "eclrc.template")
-        FileUtils.cp(template_path, RCFILE)
-        puts "#{RCFILE} successfully created. Edit it and run again!"
+        FileUtils.mkdir_p(File.dirname(CONFIG_FILE))
+        FileUtils.cp(template_path, CONFIG_FILE)
+        puts "#{CONFIG_FILE} successfully created. Edit it and run again!"
         exit
       end
     end
@@ -53,7 +67,7 @@ module Eclair
   def config
     unless @config
       @config = Config.new
-      load Config::RCFILE
+      load Config::CONFIG_FILE
     end
 
     if @config.aws_region
