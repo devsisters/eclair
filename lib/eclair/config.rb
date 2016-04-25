@@ -1,7 +1,9 @@
 module Eclair
   class Config
-    CONFIG_FILE = ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
     include Curses
+
+    CONFIG_FILE = ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
+    KEYS_DIR = "#{ENV['HOME']}/.ecl/keys"
 
     def initialize
       @aws_region = nil
@@ -32,6 +34,7 @@ module Eclair
       @disabled_color       = [COLOR_BLACK, -1, A_BOLD].freeze
       @search_color         = [COLOR_BLACK, COLOR_YELLOW].freeze
       @help_color           = [COLOR_BLACK, COLOR_WHITE].freeze
+      @dir_keys             = {}
 
       instance_variables.each do |var|
         Config.class_eval do
@@ -60,6 +63,16 @@ module Eclair
         exit
       end
     end
+    def after_load
+      dir_keys = {}
+
+      Dir["#{KEYS_DIR}/*"].each do |key|
+        if File.file? key
+          dir_keys[File.basename(key, ".*")] = key
+        end
+      end
+      @ssh_keys.merge!(dir_keys)
+    end
   end
 
   extend self
@@ -68,6 +81,7 @@ module Eclair
     unless @config
       @config = Config.new
       load Config::CONFIG_FILE
+      @config.after_load
     end
 
     if @config.aws_region
