@@ -1,11 +1,10 @@
 module Eclair
   class Config
     include Curses
-
-    CONFIG_FILE = ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
     KEYS_DIR = "#{ENV['HOME']}/.ecl/keys"
 
-    def initialize
+    def initialize opts
+      @config_file = opts[:config] || ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
       @aws_region = nil
       @columns = 4
       @group_by = lambda do |instance|
@@ -55,14 +54,15 @@ module Eclair
         exit
       end
 
-      unless File.exists? CONFIG_FILE
+      unless File.exists? @config_file
         template_path = File.join(File.dirname(__FILE__), "..", "..", "templates", "eclrc.template")
-        FileUtils.mkdir_p(File.dirname(CONFIG_FILE))
-        FileUtils.cp(template_path, CONFIG_FILE)
-        puts "#{CONFIG_FILE} successfully created. Edit it and run again!"
+        FileUtils.mkdir_p(File.dirname(@config_file))
+        FileUtils.cp(template_path, @config_file)
+        puts "#{@config_file} successfully created. Edit it and run again!"
         exit
       end
     end
+
     def after_load
       dir_keys = {}
 
@@ -76,14 +76,15 @@ module Eclair
   end
 
   extend self
+
+  def init_config opts
+    @config = Config.new(opts)
+    load @config.config_file
+    @config.after_load
+  end
+
   
   def config
-    unless @config
-      @config = Config.new
-      load Config::CONFIG_FILE
-      @config.after_load
-    end
-
     if @config.aws_region
       ::Aws.config.update(region: @config.aws_region)
     end

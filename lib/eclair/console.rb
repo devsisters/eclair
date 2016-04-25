@@ -3,8 +3,19 @@ module Eclair
     include CommonHelper
     extend self
 
+    def parse_options
+      options = {}
+      OptionParser.new do |opts|
+        opts.banner = "Usage: ecl [options]"
+        opts.on("-c", "--config FILE", "Path to config file") do |path|
+          options[:config] = path
+        end
+      end.parse!
+      options
+    end
+
     def init
-      config
+      Eclair.init_config(parse_options)
       ENV['ESCDELAY'] = "0"
       init_screen
       stdscr.keypad = true
