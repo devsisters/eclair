@@ -16,6 +16,11 @@ module Eclair
     end
 
     def instance_map
+      @instance_map if @instance_map
+      @instance_map = {}
+      instances.each do |i|
+        @instance_map[i.instance_id] = i
+      end
       @instance_map
     end
 
@@ -52,42 +57,6 @@ module Eclair
       !@security_groups_thread.alive?
     end
 
-    def reload_instances
-      return if @reload_thread && @reload_thread.alive?
-
-      if @reload_thread
-        @instances = @r_instances
-        @instance_map = @r_instances_map
-        @images += @new_images
-        @dns_records = @r_dns_records
-        @security_groups = @r_security_groups
-        Grid.assign
-        @reload_thread = nil
-      end
-
-      return if @last_reloaded && Time.now - @last_reloaded < 5
-
-      @reload_thread = Thread.new do 
-        r_instances, r_instances_map = fetch_instances
-        @new_instances = r_instances.map(&:instance_id) - @instances.map(&:instance_id)
-        if new_instances.empty?
-          @new_images = []
-        else
-          image_ids = @new_instances.map(&:image_id)
-          [
-            Thread.new do
-              @new_images = fetch_images(image_ids)
-            end,
-
-            Thread.new do
-              @r_security_groups = fetch_security_groups
-            end
-          ].each(&:join)
-        end
-        @last_reloaded = Time.now
-      end
-    end
-
     private
 
     def fetch_images image_ids
@@ -110,25 +79,24 @@ module Eclair
     end
 
     def fetch_instances
-      instance_map = {}
-
       instances = ec2.describe_instances.map{ |resp| 
         resp.data.reservations.map(&:instances)
       }.flatten
-
-      instances.each do |i|
-        instance_map[i.instance_id] = i
-      end
-
-      [instances, instance_map]
+      Eclair.cache.update :instances, instances
+      instances
+    end
+    
+    def load_from_cache
+      @instances = Eclair.cache.get(:instances)
     end
 
+    def update_instances
+      @instances = @new_instances
+    end
     
     def fetch_all
-      @instances, @instance_map = fetch_instances
-
-      image_ids = @instances.map(&:image_id)
-
+      load_from_cache
+      
       if @threads
         @threads.each{ |t| t.kill }
       end
@@ -136,6 +104,13 @@ module Eclair
       Thread.abort_on_exception = true
       
       @threads = []
+      
+      unless @instances
+        @new_instances = fetch_instances
+        update_instances
+      end
+
+      image_ids = @instances.map(&:image_id)
 
       @threads << @images_thread = Thread.new do
         @images = fetch_images(image_ids)

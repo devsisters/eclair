@@ -61,6 +61,9 @@ module Eclair
         puts "#{@config_file} successfully created. Edit it and run again!"
         exit
       end
+
+      key_path = "#{new_dir}/keys"
+      FileUtils.mkdir_p key_path unless Dir.exists? key_path
     end
 
     def after_load

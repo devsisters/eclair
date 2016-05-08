@@ -2,6 +2,7 @@ module Eclair
 end
 
 require "curses"
+require "zlib"
 require "aws-sdk"
 require "string_scorer"
 require "pry"
@@ -19,4 +20,4 @@ require "eclair/group"
 require "eclair/instance"
 require "eclair/console"
 require "eclair/color"
-
+require "eclair/cache"

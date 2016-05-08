@@ -345,13 +345,13 @@ module Eclair
       render_all
     end
 
-    def reload
-      clear
-      addstr("reloading")
-      refresh
-      Aws.reload_instances
-      assign
-      render_all
-    end
+    # def reload
+    #   clear
+    #   addstr("reloading")
+    #   refresh
+    #   Aws.reload_instances
+    #   assign
+    #   render_all
+    # end
   end
 end

@@ -56,12 +56,8 @@ module Eclair
           Grid.search(nil)
         when String
           Grid.search(k)
-        else
-          # Aws.reload_instances
-          # Grid.render_all
         end
       end
     end
   end
 end
-
