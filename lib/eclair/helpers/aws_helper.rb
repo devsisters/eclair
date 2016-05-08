@@ -16,7 +16,7 @@ module Eclair
     end
 
     def instance_map
-      @instance_map if @instance_map
+      return @instance_map if @instance_map
       @instance_map = {}
       instances.each do |i|
         @instance_map[i.instance_id] = i
