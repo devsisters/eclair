@@ -2,6 +2,7 @@ module Eclair
   class Config
     include Curses
     KEYS_DIR = "#{ENV['HOME']}/.ecl/keys"
+    CACHE_DIR = "#{ENV['HOME']}/.ecl/cache"
 
     def initialize opts
       @config_file = opts[:config] || ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
@@ -64,6 +65,7 @@ module Eclair
 
       key_path = "#{new_dir}/keys"
       FileUtils.mkdir_p key_path unless Dir.exists? key_path
+      FileUtils.mkdir_p CACHE_DIR unless Dir.exists? CACHE_DIR
     end
 
     def after_load

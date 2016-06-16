@@ -35,17 +35,8 @@ module Eclair
       " - #{name} [#{launched_at}] #{select_indicator}"
     end
 
-    def hostname
-      case config.ssh_hostname
-      when :auto
-        if object.network_interfaces.empty? && object.public_ip_address
-          object.public_ip_address
-        else
-          object.private_ip_address
-        end
-      else
-        object.send(config.ssh_hostname)
-      end
+    def hosts
+      [object.public_ip_address, object.private_ip_address].compact
     end
 
     def image **options
@@ -88,20 +79,30 @@ module Eclair
       end
     end
 
-    def ssh_cmd
-      cmd = config.ssh_ports.map{ |port|
-        "ssh #{config.ssh_options} -p#{port} #{key_cmd} #{username}@#{hostname}"
-      }.join(" || ")
+    def cache_file
+      "#{Config::CACHE_DIR}/#{object.instance_id}"
+    end
 
-      "echo Attaching to #{name}: #{username}@#{hostname} && (#{cmd})"
+    def exec_from_cache_cmd
+      "$(cat #{cache_file} 2>/dev/null)"
+    end
+
+    def ssh_cmd
+      cmd = hosts.map do |host|
+        config.ssh_ports.map do |port|
+          cmd = "ssh #{config.ssh_options} -p#{port} #{key_cmd} #{username}@#{host}"
+          "(echo #{cmd} > #{cache_file} && #{cmd})"
+        end
+      end.join(" || ")
+      "echo Attaching to #{name} \\[#{object.instance_id}\\] && (#{exec_from_cache_cmd} || (#{cmd}) || rm #{cache_file})"
     end
 
     def connectable?
-      hostname && ![48, 80].include?(state[:code])
+      ![48, 80].include?(state[:code])
     end
 
     def running?
-      hostname && state[:code] == 16
+      state[:code] == 16
     end
 
     def launched_at
@@ -135,7 +136,7 @@ module Eclair
     end
 
     def header
-      ["#{name} (#{instance_id}) [#{state[:name]}] #{hostname}",
+      ["#{name} (#{instance_id}) [#{state[:name]}]",
       "launched at #{launch_time.to_time}",
       "#{digest_routes}"]
     end

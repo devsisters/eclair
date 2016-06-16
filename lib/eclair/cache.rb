@@ -1,6 +1,6 @@
 module Eclair
   class Cache
-    CACHE_FILE = "#{ENV['HOME']}/.ecl/.cache"
+    CACHE_FILE = "#{ENV['HOME']}/.ecl/cache/api"
 
     def initialize
       @data = {}
