@@ -6,7 +6,7 @@ require "zlib"
 require "aws-sdk"
 require "string_scorer"
 require "pry"
-
+require "optionparser"
 require "eclair/helpers/benchmark_helper"
 require "eclair/helpers/common_helper"
 require "eclair/helpers/aws_helper"
