@@ -6,6 +6,10 @@ module Eclair
       @column = column
     end
 
+    def id
+      @instance_id
+    end
+
     def x
       column.x
     end
@@ -136,9 +140,10 @@ module Eclair
     end
 
     def header
-      ["#{name} (#{instance_id}) [#{state[:name]}]",
-      "launched at #{launch_time.to_time}",
-      "#{digest_routes}"]
+      <<-EOS
+      #{name} (#{instance_id}) [#{state[:name]}]
+      launched at #{launch_time.to_time}
+      EOS
     end
 
     def info

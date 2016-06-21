@@ -3,30 +3,38 @@ module Eclair
     include CommonHelper
     extend self
 
-    HEADER_ROWS = 4
     SORT_FUNCTIONS = {
       "Name" => lambda {|i| [i.name.downcase, -i.launch_time.to_i]}, 
     }
 
-    def maxy
-      stdscr.maxy - HEADER_ROWS
+    HEADER_ROWS = 4
+
+    def header_rows
+      4
     end
+
+    def maxy
+      stdscr.maxy - header_rows
+    end
+
+    def update_header str, pos = 0
+      str.split("\n").map(&:strip).each_with_index do |line, i|
+        setpos(i + pos,0)
+        clrtoeol
+        addstr(line)
+      end
+    end
+
     
     def render_header
       if mode == :search
         if cursor
-          header = ["Searching #{@search_str}", "Found #{cursor.name}", ""]
+          update_header("Searching #{@search_str}\nFound #{cursor.name}")
         else
-          header = ["Searching #{@search_str}", "None Found", ""]
+          update_header("Searching #{@search_str}\nNone Found")
         end
       else
-        header = cursor.header
-      end
-
-      header.each_with_index do |line,i|
-        setpos(i,0)
-        clrtoeol
-        addstr(line)
+        update_header(cursor.header)
       end
       render_help
     end
@@ -60,18 +68,34 @@ module Eclair
       render_all
     end
 
+    def reload
+      old_id = cursor.id
+      assign
+      x, y = find_cursor_by_id(old_id)
+      if x && y
+        move_cursor(x: x, y: y)
+      else
+        move_cursor(x: 0, y: 0)
+      end
+      render_all
+    end
+
     def assign
       sort_function = lambda {|i| [i.name.downcase, -i.launch_time.to_i]}
-      @group_map ||= {}
+      @columns = config.columns.times.map{|idx| Column.new(idx)}.to_a
+      @selected = []
+      @x = -1
+      @y = -1
+      group_map = {}
       if config.group_by
         Aws.instances.group_by(&config.group_by).each do |group, instances|
-          if @group_map[group]
-            group_cell  = @group_map[group]
+          if group_map[group]
+            group_cell  = group_map[group]
           else
             col = columns[target_col]
             group_cell = Group.new(group, col)
             col << group_cell
-            @group_map[group] = group_cell
+            group_map[group] = group_cell
           end
           instances.each do |i|
             unless group_cell.find{|j| j.instance_id == i.instance_id}
@@ -152,7 +176,7 @@ module Eclair
     end
 
     def columns
-      @columns ||= config.columns.times.map{|idx| Column.new(idx)}.to_a
+      @columns
     end
 
     def rows
@@ -165,7 +189,7 @@ module Eclair
     end
 
     def selected
-      @selected ||= []
+      @selected
     end
 
     def mode
@@ -175,7 +199,7 @@ module Eclair
     def select
       end_search if mode == :search
       if mode == :navi
-        @mode = :select
+          @mode = :select
         cursor.toggle_select
       end
       cursor.toggle_select
@@ -211,14 +235,24 @@ module Eclair
     end
 
     def cursor
-      @x ||= -1
-      @y ||= -1
       if @x >=0 && @y >= 0
         columns[@x][@y]
       else
         nil
       end
     end
+
+    def find_cursor_by_id id
+      columns.each_with_index do |col, x|
+        col.each_with_index do |v, y|
+          if id == v.id
+            return [x,y]
+          end
+        end
+      end
+      nil
+    end
+
 
     def query
       return nil if @search_str == ""
@@ -246,7 +280,6 @@ module Eclair
       x,y = @rollback_cursor
       move_cursor(x: x, y: y, mode: @rollback_mode)
     end
-
 
     def move_cursor **options, &block
       if cursor
@@ -323,27 +356,27 @@ module Eclair
       trap("INT") { exit }
     end
 
-    def next_sort_function
-      @sort_function_idx ||= -1
-      @sort_function_idx = (@sort_function_idx + 1) % SORT_FUNCTIONS.count
-      SORT_FUNCTIONS.values[@sort_function_idx]
-    end
+    # def next_sort_function
+    #   @sort_function_idx ||= -1
+    #   @sort_function_idx = (@sort_function_idx + 1) % SORT_FUNCTIONS.count
+    #   SORT_FUNCTIONS.values[@sort_function_idx]
+    # end
 
-    def sorted_by
-      SORT_FUNCTIONS.keys[@sort_function_idx]
-    end
+    # def sorted_by
+    #   SORT_FUNCTIONS.keys[@sort_function_idx]
+    # end
 
-    def change_sort
-      stored_cursor = cursor
-      sort_function = next_sort_function
-      columns.each do |column| 
-        column.groups.each do |group|
-          group.items.sort_by!(&sort_function)
-        end
-      end
-      @x, @y = stored_cursor.x, stored_cursor.y
-      render_all
-    end
+    # def change_sort
+    #   stored_cursor = cursor
+    #   sort_function = next_sort_function
+    #   columns.each do |column| 
+    #     column.groups.each do |group|
+    #       group.items.sort_by!(&sort_function)
+    #     end
+    #   end
+    #   @x, @y = stored_cursor.x, stored_cursor.y
+    #   render_all
+    # end
 
     # def reload
     #   clear

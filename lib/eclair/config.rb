@@ -2,7 +2,7 @@ module Eclair
   class Config
     include Curses
     KEYS_DIR = "#{ENV['HOME']}/.ecl/keys"
-    CACHE_DIR = "#{ENV['HOME']}/.ecl/cache"
+    CACHE_DIR = "#{ENV['HOME']}/.ecl/.cache"
 
     def initialize opts
       @config_file = opts[:config] || ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
@@ -24,7 +24,6 @@ module Eclair
         end
       end
       @ssh_keys             = {}
-      @ssh_hostname         = :public_ip_address
       @ssh_ports            = [22].freeze
       @ssh_options          = "-o ConnectTimeout=1 -o StrictHostKeyChecking=no".freeze
       @instance_color       = [COLOR_WHITE, -1].freeze

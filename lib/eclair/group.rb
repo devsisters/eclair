@@ -9,6 +9,10 @@
       @column = column
     end
 
+    def id
+      @group_name
+    end
+
     def << instance
       @items << instance
     end
@@ -30,9 +34,10 @@
     end
 
     def header
-      ["Group #{@group_name}",
-      "#{count} Instances Total",
-      "#{count(&:running?)} Instances Running"]
+      <<-EOS
+      Group #{@group_name}
+      #{count(&:running?)} Instances Running / #{count} Instances Total
+      EOS
     end
 
     def items

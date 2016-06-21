@@ -1,7 +1,6 @@
 module Eclair
   module Aws
     extend self
-
     def ec2
       @ec2 ||= ::Aws::EC2::Client.new
     end
@@ -11,8 +10,7 @@ module Eclair
     end
 
     def instances
-      fetch_all unless @instances
-      @instances
+      @instances ||= fetch_instances
     end
 
     def instance_map
@@ -57,6 +55,46 @@ module Eclair
       !@security_groups_thread.alive?
     end
 
+    def load_instances_from_cache
+      @instances = Cache.get(:instances)
+    end
+
+    def fetch_all
+      load_instances_from_cache
+
+      if @threads
+        @threads.each{ |t| t.kill }
+      end
+
+      Thread.abort_on_exception = true
+      
+      @threads = []
+      
+      if @instances
+        pid = fork do
+          fetch_instances
+        end
+        Process.detach pid if pid
+      else
+        @new_instances = fetch_instances
+        update_instances
+      end
+
+      image_ids = @instances.map(&:image_id)
+
+      @threads << @images_thread = Thread.new do
+        @images = fetch_images(image_ids)
+      end
+
+      @threads << @route53_thread = Thread.new do
+        @dns_records = fetch_dns_records
+      end
+
+      @threads << @security_groups_thread = Thread.new do
+        @security_groups = fetch_security_groups
+      end
+    end
+
     private
 
     def fetch_images image_ids
@@ -82,47 +120,13 @@ module Eclair
       instances = ec2.describe_instances.map{ |resp| 
         resp.data.reservations.map(&:instances)
       }.flatten
-      Eclair.cache.update :instances, instances
+
+      Cache.update :instances, instances
       instances
     end
     
-    def load_from_cache
-      @instances = Eclair.cache.get(:instances)
-    end
-
     def update_instances
       @instances = @new_instances
-    end
-    
-    def fetch_all
-      load_from_cache
-      
-      if @threads
-        @threads.each{ |t| t.kill }
-      end
-
-      Thread.abort_on_exception = true
-      
-      @threads = []
-      
-      unless @instances
-        @new_instances = fetch_instances
-        update_instances
-      end
-
-      image_ids = @instances.map(&:image_id)
-
-      @threads << @images_thread = Thread.new do
-        @images = fetch_images(image_ids)
-      end
-
-      @threads << @route53_thread = Thread.new do
-        @dns_records = fetch_dns_records
-      end
-
-      @threads << @security_groups_thread = Thread.new do
-        @security_groups = fetch_security_groups
-      end
     end
     
     def find_username image_id
