@@ -89,6 +89,7 @@ module Eclair
       group_map = {}
       if config.group_by
         Aws.instances.group_by(&config.group_by).each do |group, instances|
+          group_cell = nil
           if group_map[group]
             group_cell  = group_map[group]
           else
@@ -98,11 +99,18 @@ module Eclair
             group_map[group] = group_cell
           end
           instances.each do |i|
-            unless group_cell.find{|j| j.instance_id == i.instance_id}
+            unless group_cell.find{|j| j.respond_to?(:instance_id) && j.instance_id == i.instance_id}
               obj = Instance.new(i.instance_id, col)
               group_cell << obj
             end
           end
+          group_cell.items.each do |x|
+            if x.object == nil
+              close_screen
+              binding.pry
+            end
+          end
+
           group_cell.items.sort_by!(&sort_function)
         end
       else
@@ -356,35 +364,5 @@ module Eclair
       trap("INT") { exit }
     end
 
-    # def next_sort_function
-    #   @sort_function_idx ||= -1
-    #   @sort_function_idx = (@sort_function_idx + 1) % SORT_FUNCTIONS.count
-    #   SORT_FUNCTIONS.values[@sort_function_idx]
-    # end
-
-    # def sorted_by
-    #   SORT_FUNCTIONS.keys[@sort_function_idx]
-    # end
-
-    # def change_sort
-    #   stored_cursor = cursor
-    #   sort_function = next_sort_function
-    #   columns.each do |column| 
-    #     column.groups.each do |group|
-    #       group.items.sort_by!(&sort_function)
-    #     end
-    #   end
-    #   @x, @y = stored_cursor.x, stored_cursor.y
-    #   render_all
-    # end
-
-    # def reload
-    #   clear
-    #   addstr("reloading")
-    #   refresh
-    #   Aws.reload_instances
-    #   assign
-    #   render_all
-    # end
   end
 end

@@ -15,6 +15,10 @@ module Eclair
 
     def instance_map
       return @instance_map if @instance_map
+      generate_instance_map
+    end
+
+    def generate_instance_map
       @instance_map = {}
       instances.each do |i|
         @instance_map[i.instance_id] = i
@@ -57,6 +61,8 @@ module Eclair
 
     def load_instances_from_cache
       @instances = Cache.get(:instances)
+      generate_instance_map
+      @instances
     end
 
     def fetch_all
