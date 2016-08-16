@@ -94,7 +94,7 @@ module Eclair
     def ssh_cmd
       cmd = hosts.map do |host|
         config.ssh_ports.map do |port|
-          cmd = "ssh #{config.ssh_options} -p#{port} #{key_cmd} #{username}@#{host}"
+          cmd = "#{config.ssh_command} #{config.ssh_options} -p#{port} #{key_cmd} #{username}@#{host}"
           "(echo #{cmd} > #{cache_file} && #{cmd})"
         end
       end.join(" || ")

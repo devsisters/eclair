@@ -23,6 +23,7 @@ module Eclair
           "ec2-user"
         end
       end
+      @ssh_command          = "ssh"
       @ssh_keys             = {}
       @ssh_ports            = [22].freeze
       @ssh_options          = "-o ConnectTimeout=1 -o StrictHostKeyChecking=no".freeze
