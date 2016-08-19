@@ -94,7 +94,15 @@ module Eclair
     def ssh_cmd
       cmd = hosts.map do |host|
         config.ssh_ports.map do |port|
-          cmd = "#{config.ssh_command} #{config.ssh_options} -p#{port} #{key_cmd} #{username}@#{host}"
+          cmd = config.exec_format.dup
+          {
+            "{ssh_command}" => config.ssh_command,
+            "{ssh_options}" => config.ssh_options,
+            "{port}" => port,
+            "{ssh_key}" => key_cmd,
+            "{username}" => username,
+            "{host}" => host,
+          }.each { |k,v| cmd.sub!(k,v.to_s) }
           "(echo #{cmd} > #{cache_file} && #{cmd})"
         end
       end.join(" || ")

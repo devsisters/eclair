@@ -35,6 +35,7 @@ module Eclair
       @search_color         = [COLOR_BLACK, COLOR_YELLOW].freeze
       @help_color           = [COLOR_BLACK, COLOR_WHITE].freeze
       @dir_keys             = {}
+      @exec_format          = "{ssh_command} {ssh_options} -p{port} {ssh_key} {username}@{host}"
 
       instance_variables.each do |var|
         Config.class_eval do
