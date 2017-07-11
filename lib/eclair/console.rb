@@ -62,18 +62,18 @@ module Eclair
           Grid.search(k)
         end
         cnt += 1
-        if loaded 
-          Grid.update_header "#{cnt} Fetch Complete.", 2
-        else
-          if Cache.updated? :instances
-            loaded = true
-            Aws.load_instances_from_cache
-            Grid.reload
-            Grid.update_header "#{cnt} Fetch Complete.", 2
-          else
-            Grid.update_header "#{cnt} Fetching data from AWS... Showing cached results", 2
-          end
-        end
+        # if loaded 
+        #   Grid.update_header "#{cnt} Fetch Complete.", 2
+        # else
+          # if Cache.updated? :instances
+          #   loaded = true
+          #   Aws.load_instances_from_cache
+          #   Grid.reload
+          #   Grid.update_header "#{cnt} Fetch Complete.", 2
+          # else
+          #   Grid.update_header "#{cnt} Fetching data from AWS... Showing cached results", 2
+          # end
+        # end
       end
     end
   end

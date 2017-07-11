@@ -83,13 +83,13 @@ module Eclair
       end
     end
 
-    def cache_file
-      "#{Config::CACHE_DIR}/#{object.instance_id}"
-    end
+    # def cache_file
+    #   "#{Config::CACHE_DIR}/#{object.instance_id}"
+    # end
 
-    def exec_from_cache_cmd
-      "$(cat #{cache_file} 2>/dev/null)"
-    end
+    # def exec_from_cache_cmd
+    #   "$(cat #{cache_file} 2>/dev/null)"
+    # end
 
     def ssh_cmd
       cmd = hosts.map do |host|
@@ -103,10 +103,9 @@ module Eclair
             "{username}" => username,
             "{host}" => host,
           }.each { |k,v| cmd.sub!(k,v.to_s) }
-          "(echo #{cmd} > #{cache_file} && #{cmd})"
         end
       end.join(" || ")
-      "echo Attaching to #{name} \\[#{object.instance_id}\\] && (#{exec_from_cache_cmd} || (#{cmd}) || rm #{cache_file})"
+      "echo Attaching to #{name} \\[#{object.instance_id}\\] && #{cmd}"
     end
 
     def connectable?

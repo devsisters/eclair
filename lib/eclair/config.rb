@@ -66,7 +66,7 @@ module Eclair
 
       key_path = "#{new_dir}/keys"
       FileUtils.mkdir_p key_path unless Dir.exists? key_path
-      FileUtils.mkdir_p CACHE_DIR unless Dir.exists? CACHE_DIR
+      # FileUtils.mkdir_p CACHE_DIR unless Dir.exists? CACHE_DIR
     end
 
     def after_load

@@ -60,7 +60,7 @@ module Eclair
     end
 
     def load_instances_from_cache
-      @instances = Cache.get(:instances)
+      # @instances = Cache.get(:instances)
       generate_instance_map
       @instances
     end
@@ -76,15 +76,15 @@ module Eclair
       
       @threads = []
       
-      if @instances
-        pid = fork do
-          fetch_instances
-        end
-        Process.detach pid if pid
-      else
-        @new_instances = fetch_instances
-        update_instances
-      end
+      # if @instances
+      #   pid = fork do
+      #     fetch_instances
+      #   end
+      #   Process.detach pid if pid
+      # else
+      @new_instances = fetch_instances
+      update_instances
+      # end
 
       image_ids = @instances.map(&:image_id)
 
@@ -127,7 +127,7 @@ module Eclair
         resp.data.reservations.map(&:instances)
       }.flatten
 
-      Cache.update :instances, instances
+      # Cache.update :instances, instances
       instances
     end
     
