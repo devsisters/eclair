@@ -92,7 +92,7 @@ module Eclair
     # end
 
     def ssh_cmd
-      cmd = hosts.map do |host|
+      joined_cmd = hosts.map do |host|
         config.ssh_ports.map do |port|
           cmd = config.exec_format.dup
           {
@@ -103,9 +103,11 @@ module Eclair
             "{username}" => username,
             "{host}" => host,
           }.each { |k,v| cmd.sub!(k,v.to_s) }
+          cmd
         end
       end.join(" || ")
-      "echo Attaching to #{name} \\[#{object.instance_id}\\] && #{cmd}"
+      puts joined_cmd
+      "echo Attaching to #{name} \\[#{object.instance_id}\\] && #{joined_cmd}"
     end
 
     def connectable?
