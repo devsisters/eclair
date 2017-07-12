@@ -264,7 +264,13 @@ module Eclair
 
     def query
       return nil if @search_str == ""
-      result = columns.map(&:expand).flatten.grep(Instance).map(&:name).max_by{|name| name.score @search_str}
+      result = columns
+        .map(&:expand)
+        .flatten
+        .grep(Instance)
+        .reject{|i| [32, 48, 80].include?(i.state[:code])}
+        .map(&:name)
+        .max_by{|name| name.score @search_str}
       return nil if result.score(@search_str) == 0.0
       result
     end
