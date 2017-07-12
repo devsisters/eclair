@@ -13,6 +13,10 @@ module Eclair
       @instances ||= fetch_instances
     end
 
+    def vpcs
+      @vpcs ||= fetch_vpcs
+    end
+
     def instance_map
       return @instance_map if @instance_map
       generate_instance_map
@@ -82,6 +86,7 @@ module Eclair
       #   end
       #   Process.detach pid if pid
       # else
+
       @new_instances = fetch_instances
       update_instances
       # end
@@ -129,6 +134,10 @@ module Eclair
 
       # Cache.update :instances, instances
       instances
+    end
+
+    def fetch_vpcs
+      ec2.describe_vpcs.map{|resp| resp.vpcs}.flatten
     end
     
     def update_instances

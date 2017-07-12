@@ -24,7 +24,6 @@ module Eclair
         addstr(line)
       end
     end
-
     
     def render_header
       if mode == :search
