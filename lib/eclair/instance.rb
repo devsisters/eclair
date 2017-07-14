@@ -28,10 +28,10 @@ module Eclair
     end
 
     def color
-      if [32, 48, 80].include?(state[:code])
-        super(*config.disabled_color)
-      else
+      if connectable?
         super(*config.instance_color)
+      else
+        super(*config.disabled_color)
       end
     end
 

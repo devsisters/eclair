@@ -263,11 +263,12 @@ module Eclair
 
     def query
       return nil if @search_str == ""
+
       result = columns
         .map(&:expand)
         .flatten
         .grep(Instance)
-        .reject{|i| [32, 48, 80].include?(i.state[:code])}
+        .select{|i| i.connectable?}
         .map(&:name)
         .max_by{|name| name.score @search_str}
       return nil if result.score(@search_str) == 0.0
@@ -336,7 +337,7 @@ module Eclair
 
         result = nil
         columns.each do |col|
-          target = col.find {|item| item.is_a?(Instance) && item.name == goto}
+          target = col.find {|item| item.is_a?(Instance) && item.connectable? && item.name == goto}
           if target
             result = [target.x, target.y]
             break
