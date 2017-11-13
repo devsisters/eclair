@@ -5,6 +5,7 @@ module Eclair
     CACHE_DIR = "#{ENV['HOME']}/.ecl/.cache"
 
     def initialize opts
+      @done = false
       @config_file = opts[:config] || ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
       @aws_region = nil
       @columns = 4
@@ -86,6 +87,7 @@ module Eclair
   def init_config opts
     @config = Config.new(opts)
     load @config.config_file
+    raise unless @done
     @config.after_load
   end
 
@@ -98,7 +100,14 @@ module Eclair
     @config
   end
 
-  def configure
-    yield config
+  def profile
+    ENV["ECL_PROFILE"] || "default"
+  end
+
+  def configure name = "default"
+    if profile == name
+      @done = true
+      yield config
+    end
   end
 end
