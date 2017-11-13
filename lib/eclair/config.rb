@@ -1,6 +1,5 @@
 module Eclair
   class Config
-    include Curses
     KEYS_DIR = "#{ENV['HOME']}/.ecl/keys"
     CACHE_DIR = "#{ENV['HOME']}/.ecl/.cache"
 
@@ -28,13 +27,13 @@ module Eclair
       @ssh_keys             = {}
       @ssh_ports            = [22].freeze
       @ssh_options          = "-o ConnectTimeout=1 -o StrictHostKeyChecking=no".freeze
-      @instance_color       = [COLOR_WHITE, -1].freeze
-      @group_color          = [COLOR_WHITE, -1, A_BOLD].freeze
-      @current_color        = [COLOR_BLACK, COLOR_CYAN].freeze
-      @selected_color       = [COLOR_YELLOW, -1, A_BOLD].freeze
-      @disabled_color       = [COLOR_BLACK, -1, A_BOLD].freeze
-      @search_color         = [COLOR_BLACK, COLOR_YELLOW].freeze
-      @help_color           = [COLOR_BLACK, COLOR_WHITE].freeze
+      @instance_color       = [Curses::COLOR_WHITE, -1].freeze
+      @group_color          = [Curses::COLOR_WHITE, -1, Curses::A_BOLD].freeze
+      @current_color        = [Curses::COLOR_BLACK, Curses::COLOR_CYAN].freeze
+      @selected_color       = [Curses::COLOR_YELLOW, -1, Curses::A_BOLD].freeze
+      @disabled_color       = [Curses::COLOR_BLACK, -1, Curses::A_BOLD].freeze
+      @search_color         = [Curses::COLOR_BLACK, Curses::COLOR_YELLOW].freeze
+      @help_color           = [Curses::COLOR_BLACK, Curses::COLOR_WHITE].freeze
       @dir_keys             = {}
       @exec_format          = "{ssh_command} {ssh_options} -p{port} {ssh_key} {username}@{host}"
 

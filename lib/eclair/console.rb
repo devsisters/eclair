@@ -18,23 +18,23 @@ module Eclair
       Eclair.init_config(parse_options)
       Aws.fetch_all
       ENV['ESCDELAY'] = "0"
-      init_screen
-      stdscr.timeout = 100
-      stdscr.keypad = true
-      start_color
-      use_default_colors
-      crmode
-      noecho
-      curs_set(0)
+      Curses.init_screen
+      Curses.stdscr.timeout = 100
+      Curses.stdscr.keypad = true
+      Curses.start_color
+      Curses.use_default_colors
+      Curses.crmode
+      Curses.noecho
+      Curses.curs_set(0)
       Grid.start
       trap("INT") { exit }
       loaded = false
       cnt = 0
       loop do
-        case k = stdscr.getch
-        when KEY_RESIZE
+        case k = Curses.stdscr.getch
+        when Curses::KEY_RESIZE
           Grid.resize
-        when KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN
+        when Curses::KEY_LEFT, Curses::KEY_RIGHT, Curses::KEY_UP, Curses::KEY_DOWN
           Grid.move k
         when " "
           if Grid.mode == :search
@@ -56,24 +56,13 @@ module Eclair
           Grid.debug
         when ??
           Grid.cursor_inspect
-        when KEY_BACKSPACE, 127
+        when Curses::KEY_BACKSPACE, 127
           Grid.search(nil)
         when String
           Grid.search(k)
         end
         cnt += 1
-        # if loaded 
-        #   Grid.update_header "#{cnt} Fetch Complete.", 2
-        # else
-          # if Cache.updated? :instances
-          #   loaded = true
-          #   Aws.load_instances_from_cache
-          #   Grid.reload
-          #   Grid.update_header "#{cnt} Fetch Complete.", 2
-          # else
-          #   Grid.update_header "#{cnt} Fetching data from AWS... Showing cached results", 2
-          # end
-        # end
+      
       end
     end
   end

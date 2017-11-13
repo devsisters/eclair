@@ -14,14 +14,14 @@ module Eclair
     end
 
     def maxy
-      stdscr.maxy - header_rows
+      Curses.stdscr.maxy - header_rows
     end
 
     def update_header str, pos = 0
       str.split("\n").map(&:strip).each_with_index do |line, i|
-        setpos(i + pos,0)
-        clrtoeol
-        addstr(line)
+        Curses.setpos(i + pos,0)
+        Curses.clrtoeol
+        Curses.addstr(line)
       end
     end
     
@@ -39,8 +39,8 @@ module Eclair
     end
 
     def render_help
-      setpos(3,0)
-      clrtoeol
+      Curses.setpos(3,0)
+      Curses.clrtoeol
 
       helps = {
         "Enter" => "SSH",
@@ -50,15 +50,15 @@ module Eclair
         "!" => "Open Ruby REPL",
       }
 
-      attron(Color.fetch(*config.help_color)) do
-        addstr helps.map{ |key, action|   
+      Curses.attron(Color.fetch(*config.help_color)) do
+        Curses.addstr helps.map{ |key, action|   
           " #{key} => #{action}"
-        }.join("    ").slice(0,stdscr.maxx).ljust(stdscr.maxx)
+        }.join("    ").slice(0,Curses.stdscr.maxx).ljust(Curses.stdscr.maxx)
       end
     end
 
     def cell_width
-      stdscr.maxx/column_count
+      Curses.stdscr.maxx/column_count
     end
 
     def start
@@ -105,7 +105,7 @@ module Eclair
           end
           group_cell.items.each do |x|
             if x.object == nil
-              close_screen
+              Curses.close_screen
               binding.pry
             end
           end
@@ -130,20 +130,20 @@ module Eclair
     end
 
     def render_all
-      clear
+      Curses.clear
       columns.each do |cols|
         cols.each do |c|
           c.render
         end
       end
       render_header
-      refresh
+      Curses.refresh
     end
 
     def ssh
       targets = selected.select{|i| i.is_a?(Instance) && i.connectable?}
       return if targets.empty?
-      close_screen
+      Curses.close_screen
 
       cmd = ""
       if targets.count == 1
@@ -219,13 +219,13 @@ module Eclair
     def move key
       end_search if mode == :search
       mx,my = {
-        KEY_UP => [0,-1],
+        Curses::KEY_UP => [0,-1],
         "k" => [0,-1],
-        KEY_DOWN => [0,1],
+        Curses::KEY_DOWN => [0,1],
         "j" => [0,1],
-        KEY_LEFT => [-1,0],
+        Curses::KEY_LEFT => [-1,0],
         "h" => [-1,0],
-        KEY_RIGHT => [1,0],
+        Curses::KEY_RIGHT => [1,0],
         "l" => [1,0],
       }[key]
 
@@ -352,19 +352,19 @@ module Eclair
 
     def resize
       columns.each{|col| col.scroll = 0}
-      render_all
+      Curses.render_all
       cursor.check_scroll
     end
 
     def cursor_inspect
-      close_screen
+      Curses.close_screen
       LessViewer.show cursor.info
       render_all
     end
 
     def debug
       trap("INT") { raise Interrupt }
-      close_screen
+      Curses.close_screen
       binding.pry      
       render_all
       trap("INT") { exit }

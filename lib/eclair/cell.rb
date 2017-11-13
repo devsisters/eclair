@@ -28,10 +28,10 @@ module Eclair
       drawy = y - column.scroll
       return if drawy < 0 || drawy >= Grid.maxy
       w = Grid.cell_width
-      setpos(drawy + Grid::HEADER_ROWS, x * w)
+      Curses.setpos(drawy + Grid::HEADER_ROWS, x * w)
       str = format.slice(0, w).ljust(w)
-      attron(color) do
-        addstr(str)
+      Curses.attron(color) do
+        Curses.addstr(str)
       end
       Grid.render_header
     end
@@ -83,7 +83,7 @@ module Eclair
 
     def redraw
       render
-      refresh
+      Curses.refresh
     end
 
     def select_indicator
