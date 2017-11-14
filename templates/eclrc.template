@@ -59,8 +59,4 @@ Eclair.configure do |config|
   # ssh_options - Extra options passed to ssh.
   # ConnectTimeout should exist when you want to connect to multiple ports.
   config.ssh_options = "-o ConnectTimeout=1 -o StrictHostKeyChecking=no"
-
-  # ssh_hostname - Hostname to use for ssh.
-  # You can choose from :public_dns_name, :public_ip_address, :private_dns_name, :private_ip_address
-  config.ssh_hostname = :public_ip_address
 end
