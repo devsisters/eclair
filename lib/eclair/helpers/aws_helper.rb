@@ -77,9 +77,9 @@ module Eclair
       end
 
       Thread.abort_on_exception = true
-      
+
       @threads = []
-      
+
       # if @instances
       #   pid = fork do
       #     fetch_instances
@@ -128,7 +128,7 @@ module Eclair
     end
 
     def fetch_instances
-      instances = ec2.describe_instances.map{ |resp| 
+      instances = ec2.describe_instances.map{ |resp|
         resp.data.reservations.map(&:instances)
       }.flatten
 
@@ -139,11 +139,11 @@ module Eclair
     def fetch_vpcs
       ec2.describe_vpcs.map{|resp| resp.vpcs}.flatten
     end
-    
+
     def update_instances
       @instances = @new_instances
     end
-    
+
     def find_username image_id
       config.ssh_username.call(image_id, @images[image_id].name)
     end

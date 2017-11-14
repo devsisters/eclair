@@ -8,7 +8,7 @@ module Eclair
         q.flush
         out << "\n"
       end
-      
+
       def text(str, width = str.length)
         super(CodeRay.scan(str, :ruby).term, width)
       end

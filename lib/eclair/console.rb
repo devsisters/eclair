@@ -62,7 +62,7 @@ module Eclair
           Grid.search(k)
         end
         cnt += 1
-      
+
       end
     end
   end

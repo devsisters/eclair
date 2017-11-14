@@ -11,7 +11,7 @@ module Eclair
           define_method method_name do |*args, &blk|
             self.send(name).send(method_name, *args, &blk)
           end
-        end 
+        end
       end
     end
 

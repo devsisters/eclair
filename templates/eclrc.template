@@ -50,7 +50,7 @@ Eclair.configure do |config|
   # end
 
   # If you do not want to group instances, uncomment below line.
-  # config.group_by = nil  
+  # config.group_by = nil
 
   # ssh_ports - Port numbers to try ssh.
   # Eclair will try to ssh specified ports in order with ConnectTimeout below.

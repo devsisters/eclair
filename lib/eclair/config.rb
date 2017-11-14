@@ -90,7 +90,7 @@ module Eclair
     @config.after_load
   end
 
-  
+
   def config
     if @config.aws_region
       ::Aws.config.update(region: @config.aws_region)
