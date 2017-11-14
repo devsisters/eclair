@@ -1,7 +1,7 @@
 module Eclair
   class Cell
     include CommonHelper
-    
+
     attr_accessor :column
     attr_accessor :selected
 
@@ -47,7 +47,7 @@ module Eclair
       Grid.selected << self
       redraw
     end
- 
+
     def toggle_select
       if respond_to? :each
         if all?(&:selected)
@@ -97,5 +97,5 @@ module Eclair
     def method_missing name, *args, &blk
       object.send(name)
     end
-  end  
+  end
 end

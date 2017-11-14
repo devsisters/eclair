@@ -4,7 +4,7 @@ module Eclair
     extend self
 
     SORT_FUNCTIONS = {
-      "Name" => lambda {|i| [i.name.downcase, -i.launch_time.to_i]}, 
+      "Name" => lambda {|i| [i.name.downcase, -i.launch_time.to_i]},
     }
 
     HEADER_ROWS = 4
@@ -24,7 +24,7 @@ module Eclair
         Curses.addstr(line)
       end
     end
-    
+
     def render_header
       if mode == :search
         if cursor
@@ -51,7 +51,7 @@ module Eclair
       }
 
       Curses.attron(Color.fetch(*config.help_color)) do
-        Curses.addstr helps.map{ |key, action|   
+        Curses.addstr helps.map{ |key, action|
           " #{key} => #{action}"
         }.join("    ").slice(0,Curses.stdscr.maxx).ljust(Curses.stdscr.maxx)
       end
@@ -116,7 +116,7 @@ module Eclair
         col_limit = (Aws.instances.count - 1) / config.columns + 1
         iter = Aws.instances.map{|i| Instance.new(i.instance_id)}.sort_by(&sort_function).each
         columns.each do |col|
-          col_limit.times do 
+          col_limit.times do
             begin
               i = iter.next
               i.column = col
@@ -154,7 +154,7 @@ module Eclair
         target_cmd = ""
 
         targets.each_with_index do |target, i|
-          if i == 0 
+          if i == 0
             if ENV['TMUX'] # Eclair called inside of tmux
               # Create new session and save window id
               window_name = `tmux new-window -P -- '#{target.ssh_cmd}'`.strip
@@ -165,12 +165,12 @@ module Eclair
               target_cmd = "-t #{session_name}"
               `tmux new-session -d -s #{session_name} -- '#{target.ssh_cmd}'`
             end
-          else # Split layout and 
+          else # Split layout and
             cmds << "split-window #{target_cmd} -- '#{target.ssh_cmd}'"
             cmds << "select-layout #{target_cmd} tiled"
           end
         end
-        cmds << "set-window-option #{target_cmd} synchronize-panes on" 
+        cmds << "set-window-option #{target_cmd} synchronize-panes on"
         cmds << "attach #{target_cmd}" unless ENV['TMUX']
         cmd = "tmux #{cmds.join(" \\; ")}"
       end
@@ -232,7 +232,7 @@ module Eclair
       newx = (@x + mx) % column_count
       newy = (@y + my - columns[@x].scroll + columns[newx].scroll)
       if my != 0
-        newy %= columns[newx].count 
+        newy %= columns[newx].count
       end
       if newy >= columns[newx].count
         newy = columns[newx].count-1
@@ -325,8 +325,8 @@ module Eclair
 
     def search key
       @search_str ||= ""
-  
-      move_cursor(mode: :search) do 
+
+      move_cursor(mode: :search) do
         if key
           @search_str = @search_str+key
         else
@@ -346,8 +346,8 @@ module Eclair
 
         result || [-1,-1]
       end
-      
-      render_header 
+
+      render_header
     end
 
     def resize
@@ -365,7 +365,7 @@ module Eclair
     def debug
       trap("INT") { raise Interrupt }
       Curses.close_screen
-      binding.pry      
+      binding.pry
       render_all
       trap("INT") { exit }
     end

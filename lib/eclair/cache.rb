@@ -2,7 +2,7 @@ module Eclair
   module Cache
     # extend self
     # CACHE_FILE = "#{Config::CACHE_DIR}/cache"
-    
+
     # def mtime
     #   return @mtime if @mtime
     #   @mtime = {}

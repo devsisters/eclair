@@ -11,10 +11,28 @@ Eclair.configure do |config|
   # https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_images-instance_method
   config.ssh_username = lambda do |image|
     case image.name
-    when /ubuntu/
-      "ubuntu"
-    else
+
+    # Add your own configurations here
+    # when /OpenVPN/
+    #   "openvpnas"
+
+    when /ubuntu/i
+      "ubuntu" # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html#AccessingInstancesLinuxSSHClient
+    when /centos/i
+      "centos" # https://wiki.centos.org/Cloud/AWS
+    when /debian/i
+      "admin" # https://wiki.debian.org/Cloud#FAQ
+    when /^bitnami-/
+      "bitnami" # https://docs.bitnami.com/aws/faq/#how-to-connect-to-the-server-through-ssh
+    when /CoreOS/
+      "core" # https://coreos.com/os/docs/latest/booting-on-ec2.html#ssh-to-your-instances
+    when /redhat/i, /RHEL|rhel/, /fedora/i, /suse/i, /SLES|sles/, /FreeBSD/
       "ec2-user"
+    else
+      fallback = "ec2-user"
+      msg = "Cannot infer ssh username of image \e[33m#{image.name}\e[0m. Fallback to \e[33m#{fallback}\e[0m"
+      STDERR.puts STDERR.isatty ? msg : msg.gsub(/\e\[([;\d]+)?m/, '')
+      fallback
     end
   end
 
@@ -50,7 +68,7 @@ Eclair.configure do |config|
   # end
 
   # If you do not want to group instances, uncomment below line.
-  # config.group_by = nil  
+  # config.group_by = nil
 
   # ssh_ports - Port numbers to try ssh.
   # Eclair will try to ssh specified ports in order with ConnectTimeout below.
@@ -59,8 +77,4 @@ Eclair.configure do |config|
   # ssh_options - Extra options passed to ssh.
   # ConnectTimeout should exist when you want to connect to multiple ports.
   config.ssh_options = "-o ConnectTimeout=1 -o StrictHostKeyChecking=no"
-
-  # ssh_hostname - Hostname to use for ssh.
-  # You can choose from :public_dns_name, :public_ip_address, :private_dns_name, :private_ip_address
-  config.ssh_hostname = :public_ip_address
 end

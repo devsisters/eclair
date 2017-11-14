@@ -49,7 +49,7 @@ module Eclair
 
     def security_groups **options
       if Aws.security_groups?
-        object.security_groups.map{|instance_sg| 
+        object.security_groups.map{|instance_sg|
           Aws.security_groups(**options).find{|sg| sg.group_id == instance_sg.group_id }
         }.compact
       else
@@ -59,7 +59,7 @@ module Eclair
 
     def routes
       if Aws.dns_records?
-        Aws.dns_records.select do |record| 
+        Aws.dns_records.select do |record|
           values = record.resource_records.map(&:value)
           !values.grep(private_dns_name).empty? ||
           !values.grep(public_dns_name).empty? ||
@@ -157,7 +157,7 @@ module Eclair
 
     def info
       to_merge = {}
-      
+
       if routes
         to_merge[:routes] = routes.map(&:to_h)
       else
@@ -177,4 +177,4 @@ module Eclair
       Aws.instance_map[@instance_id]
     end
   end
-end 
+end
