@@ -1,5 +1,4 @@
-
-
+# frozen_string_literal: true
 require "eclair/group_item"
 require "eclair/color"
 
@@ -15,7 +14,7 @@ module Eclair
         @provider = K8sProvider
       end
       @item_class = @provider.item_class
-      
+
       @grid = config.columns.times.map{[]}
       @scroll = config.columns.times.map{0}
       @header_rows = 4
@@ -28,7 +27,7 @@ module Eclair
       assign
       at(*@cursor).toggle_select
       draw_all
-    end    
+    end
 
     def move key
       prev = @cursor.dup
@@ -79,7 +78,7 @@ module Eclair
     def action
       targets = @provider.items.select{|i| i.selected}
       return if targets.length == 0
-      
+
       Curses.close_screen
 
       if targets.length == 1
@@ -131,7 +130,7 @@ module Eclair
         Curses.addstr(line)
       end
     end
-    
+
     def rescroll x, y
       unless (@scroll[x]...@maxy+@scroll[x]).include? y
         if y < @scroll[x]
@@ -144,7 +143,7 @@ module Eclair
         end
       end
     end
-      
+
     def at x, y
       @grid[x][y]
     end
@@ -163,9 +162,9 @@ module Eclair
       end
       update_header(at(*@cursor).header)
     end
-    
+
     def color x, y
-      if @cursor == [x,y] 
+      if @cursor == [x,y]
         Color.fetch(Curses::COLOR_BLACK, Curses::COLOR_CYAN)
       else
         Color.fetch(*@grid[x][y].color)
@@ -174,7 +173,7 @@ module Eclair
 
     def draw_item x, y
       target = @grid[x][y]
-      
+
       drawy = y - @scroll[x]
       if drawy < 0 || drawy + @header_rows >= Curses.stdscr.maxy
         return

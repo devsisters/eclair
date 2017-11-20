@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "aws-sdk-ec2"
 
 require "eclair/item"
@@ -6,7 +7,7 @@ require "eclair/providers/ec2/ec2_provider"
 module Eclair
   class EC2Item < Item
     attr_reader :instance
-    
+
     def initialize instance
       super()
       @instance = instance
@@ -34,7 +35,7 @@ module Eclair
       username = config.ssh_username.call(image)
       key_cmd = config.ssh_keys[@instance.key_name] ? "-i #{config.ssh_keys[@instance.key_name]}" : ""
       format = config.exec_format
-      
+
       joined_cmd = hosts.map do |host|
         ports.map do |port|
           {
@@ -50,7 +51,7 @@ module Eclair
       # puts joined_cmd
       "echo Attaching to #{name} \\[#{@instance.instance_id}\\] && #{joined_cmd}"
     end
-    
+
     def header
       <<-EOS
       #{name} (#{instance_id}) [#{state[:name]}]
@@ -72,7 +73,7 @@ module Eclair
       launched at #{@instance.launch_time.to_time}
       EOS
     end
-    
+
     def label
       " - #{name} [#{launched_at}]"
     end
@@ -96,7 +97,7 @@ module Eclair
         @name = "terminated"
       end
     end
-    
+
     def security_groups
       @security_groups ||= @instance.security_groups.map{|sg| provider.find_security_group_by_id(sg.group_id)}
     end

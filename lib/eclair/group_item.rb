@@ -1,7 +1,8 @@
+# frozen_string_literal: true
 module Eclair
   class GroupItem < Item
     attr_reader :label
-    
+
     def initialize label, items
       @label = label
       @items = items
@@ -18,10 +19,9 @@ module Eclair
     def length
       @items.length
     end
-    
+
     def color
       [Curses::COLOR_WHITE, -1, Curses::A_BOLD]
     end
   end
 end
-
