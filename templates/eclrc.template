@@ -1,32 +1,40 @@
 # frozen_string_literal: true
+
+## Default configuration.
 Eclair.configure do |config|
-  # aws_region - AWS region to connect.
-  # This overrides AWS_REGION environment variable, so you can comment out this line if you set this in environment variable.
-  config.aws_region = "ap-northeast-1"
+  ## provider - Cloud provider to connect.
+  ## You can use either AWS EC2 (:ec2) or Kubernetes (:k8s) with eclair. AWS
+  ## EC2 is used by default.
+  # config.provider = :ec2
 
-  # columns - Max number of columns displayed in eclair.
-  config.columns = 4
+  ## aws_region - AWS region to connect.
+  ## This overrides AWS_REGION environment variable, so you can comment out this
+  ## line if you set this in environment variable.
+  # config.aws_region = "ap-northeast-1"
 
-  # ssh_username - Function to find username from image
-  # You can use image data from EC2::Client#describe_images API call
-  # https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_images-instance_method
+  ## columns - Max number of columns displayed in eclair. (Default: 4)
+  # config.columns = 4
+
+  ## ssh_username - Function to find username from image.
+  ## You can use image data from EC2::Client#describe_images API call.
+  ## https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_images-instance_method
   config.ssh_username = lambda do |image|
     case image.name
 
-    # Add your own configurations here
+    ## Add your own configurations here.
     # when /OpenVPN/
     #   "openvpnas"
 
     when /ubuntu/i
-      "ubuntu" # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html#AccessingInstancesLinuxSSHClient
+      "ubuntu" ## https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html#AccessingInstancesLinuxSSHClient
     when /centos/i
-      "centos" # https://wiki.centos.org/Cloud/AWS
+      "centos" ## https://wiki.centos.org/Cloud/AWS
     when /debian/i
-      "admin" # https://wiki.debian.org/Cloud#FAQ
+      "admin" ## https://wiki.debian.org/Cloud#FAQ
     when /^bitnami-/
-      "bitnami" # https://docs.bitnami.com/aws/faq/#how-to-connect-to-the-server-through-ssh
+      "bitnami" ## https://docs.bitnami.com/aws/faq/#how-to-connect-to-the-server-through-ssh
     when /CoreOS/
-      "core" # https://coreos.com/os/docs/latest/booting-on-ec2.html#ssh-to-your-instances
+      "core" ## https://coreos.com/os/docs/latest/booting-on-ec2.html#ssh-to-your-instances
     when /redhat/i, /RHEL|rhel/, /fedora/i, /suse/i, /SLES|sles/, /FreeBSD/
       "ec2-user"
     else
@@ -37,17 +45,20 @@ Eclair.configure do |config|
     end
   end
 
-  # ssh_keys - Hash of key_name => key_path in local.
-  # If your key has been already registered in ssh-agent, you don't have to configure this.
-  config.ssh_keys = {
-  }
+  ## ssh_keys - Hash of key_name => key_path in local.
+  ## If your key has been already registered in ssh-agent, you don't have to
+  ## configure this. (Default: {})
+  # config.ssh_keys = {
+  # }
 
-  # group_by - Function to find group name from instance.
-  # Make a function that returns group name from instance data
-  # You can access response data extracted from EC2::Client#describe_instances API call
-  # https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_instances-instance_method
+  ## group_by - Function to find group name from instance.
+  ## Make a function that returns group name from instance data.
+  ## You can access response data extracted from EC2::Client#describe_instances
+  ## API call.
+  ##
+  ## https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_instances-instance_method
 
-  # If you want to group instances by security group, uncomment example below. (default option)
+  ## If you want to group instances by security group, uncomment the example below. (Default behavior)
   # config.group_by = lambda do |instance|
   #   if instance.security_groups.first
   #     instance.security_groups.first.group_name
@@ -56,11 +67,9 @@ Eclair.configure do |config|
   #   end
   # end
 
-  # If you want to group instances by name, uncomment and edit example below.
+  ## If you want to group instances by name, uncomment and edit the example below.
   # config.group_by = lambda do |instance|
-  #   nametag = instance.tags.find{|t| t.key == "Name"}
-  #   return "Noname" unless nametag
-  #   case nametag.value
+  #   case instance.name
   #   when /^production/
   #     "production servers"
   #   when /^test/
@@ -68,14 +77,36 @@ Eclair.configure do |config|
   #   end
   # end
 
-  # If you do not want to group instances, uncomment below line.
+  ## If you do not want to group instances, uncomment the line below.
   # config.group_by = nil
 
-  # ssh_ports - Port numbers to try ssh.
-  # Eclair will try to ssh specified ports in order with ConnectTimeout below.
-  config.ssh_ports = [22]
+  ## ssh_ports - Port numbers to try ssh.
+  ## Eclair will try to ssh specified ports in order with ConnectTimeout below.
+  # config.ssh_ports = [22]
 
-  # ssh_options - Extra options passed to ssh.
-  # ConnectTimeout should exist when you want to connect to multiple ports.
-  config.ssh_options = "-o ConnectTimeout=1 -o StrictHostKeyChecking=no"
+  ## ssh_options - Extra options passed to ssh.
+  ## ConnectTimeout should exist when you want to connect to multiple ports.
+  # config.ssh_options = "-o ConnectTimeout=1 -o StrictHostKeyChecking=no"
+
+  ## ssh_command - Name of the binary which will be used to establish ssh
+  ## connection. (Default: "ssh")
+  # config.ssh_command = "/usr/bin/ssh"
+
+  ## exec_format - Format of the shell command which will be executed in the
+  ## shell. (Default: "{ssh_command} {ssh_options} -p{port} {ssh_key} {username}@{host}")
+  # config.exec_format = "echo 'hi' && {ssh_command} {ssh_options} -p{port} {ssh_key} {username}@{host}"
+end
+
+## Alternative configuration.
+##
+## You can easily switch between multiple configurations with 'ECL_PROFILE'
+## environment variable. To use 'k8s' configuration, execute eclair like below:
+##
+##     ECL_PROFILE=k8s ecl
+Eclair.configure "k8s" do |config|
+  config.provider = :k8s
+  config.get_pods_option = "--all-namespaces"
+  config.group_by = lambda do |item|
+    item.namespace
+  end
 end
