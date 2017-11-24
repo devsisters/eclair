@@ -19,6 +19,8 @@ module Eclair
     def color
       if @selected
         [Curses::COLOR_YELLOW, -1, Curses::A_BOLD]
+      elsif !connectable?
+        [Curses::COLOR_BLACK, -1, Curses::A_BOLD]
       else
         [Curses::COLOR_WHITE, -1]
       end
@@ -115,6 +117,10 @@ module Eclair
         end
       end
       "now"
+    end
+
+    def connectable?
+      ![32, 48, 80].include?(@instance.state[:code])
     end
 
     def provider
