@@ -12,6 +12,7 @@ module Eclair
       @cursor = [0,0]
       @cell_width = Curses.stdscr.maxx/config.columns
       @maxy = Curses.stdscr.maxy - @header_rows
+      @mode = :nav
 
       provider.prepare
       assign
@@ -43,17 +44,60 @@ module Eclair
       prev_item = at(*prev)
       curr_item = at(*@cursor)
       rescroll(*@cursor)
-      prev_item.toggle_select
-      curr_item.toggle_select
+      if @mode == :nav
+        prev_item.toggle_select
+        curr_item.toggle_select
+      end
       draw(*prev)
+      draw(*@cursor)
+    end
+
+    def space
+      if @mode == :nav
+        @mode = :sel
+        at(*@cursor).toggle_select
+      end
+      at(*@cursor).toggle_select
+      if @mode == :sel && provider.items.all?{|i| !i.selected}
+        @mode = :nav
+        at(*@cursor).toggle_select
+      end
       draw(*@cursor)
     end
 
     def action
       Curses.close_screen
 
-      target = at(*@cursor)
-      system(target.command)
+      targets = provider.items.select{|i| i.selected}
+
+      if targets.length == 1
+        cmd = targets.first.command
+      else
+        cmds = []
+        target_cmd = ""
+
+        targets.each_with_index do |target, i|
+          if i == 0
+            if ENV['TMUX'] # Eclair called inside of tmux
+              # Create new session and save window id
+              window_name = `tmux new-window -P -- '#{target.command}'`.strip
+              target_cmd = "-t #{window_name}"
+            else # Eclair called from outside of tmux
+              # Create new session and save session
+              session_name = "eclair#{Time.now.to_i}"
+              target_cmd = "-t #{session_name}"
+              `tmux new-session -d -s #{session_name} -- '#{target.command}'`
+            end
+          else # Split layout and
+            cmds << "split-window #{target_cmd} -- '#{target.command}'"
+            cmds << "select-layout #{target_cmd} tiled"
+          end
+        end
+        cmds << "set-window-option #{target_cmd} synchronize-panes on"
+        cmds << "attach #{target_cmd}" unless ENV['TMUX']
+        cmd = "tmux #{cmds.join(" \\; ")}"
+      end
+      system(cmd)
       exit
     end
 
@@ -85,14 +129,9 @@ module Eclair
     end
 
     def make_label target
-      ind = " * "
-      no_ind = " " * ind.length
-      case target
-      when GroupItem
-        target.label.slice(0, @cell_width).ljust(@cell_width)
-      when Item
-        target.label.slice(0, @cell_width - ind.length).ljust(@cell_width - ind.length) + (target.selected ? ind : no_ind)
-      end
+      ind = (@mode == :sel && target.selected) ? "*" : " "
+      label = "#{target.label} #{ind}"
+      label.slice(0, @cell_width).ljust(@cell_width)
     end
 
     def draw_all

@@ -27,10 +27,10 @@ loop do
   when Curses::KEY_LEFT, Curses::KEY_RIGHT, Curses::KEY_UP, Curses::KEY_DOWN
     grid.move(k)
   when " "
-    if Grid.mode == :search
-      Grid.end_search
-    end
-    Grid.select
+    # if Grid.mode == :search
+    #   Grid.end_search
+    # end
+    grid.space
   when 10
     grid.action
     # case Grid.mode
