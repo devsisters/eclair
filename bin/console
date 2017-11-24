@@ -6,5 +6,52 @@ require "eclair"
 # with your gem easier. You can also use a different console, if you like.
 
 # (If you use this, don't forget to add pry to your Gemfile!)
-require "pry"
-Pry.start
+
+require "eclair/grid"
+Eclair.init_config
+Curses.init_screen
+Curses.stdscr.timeout = 100
+Curses.stdscr.keypad = true
+Curses.start_color
+Curses.use_default_colors
+Curses.crmode
+Curses.noecho
+Curses.curs_set(0)
+trap("INT") { exit }
+grid = Eclair::Grid.new(Eclair::EC2Provider)
+
+loop do
+  case k = Curses.stdscr.getch
+  when Curses::KEY_RESIZE
+    grid.resize
+  when Curses::KEY_LEFT, Curses::KEY_RIGHT, Curses::KEY_UP, Curses::KEY_DOWN
+    grid.move(k)
+  when " "
+    if Grid.mode == :search
+      Grid.end_search
+    end
+    Grid.select
+  when 10
+    grid.action
+    # case Grid.mode
+    # when :search
+    #   Grid.end_search
+    # else
+    #   Grid.ssh
+    # end
+  when 27
+    if Grid.mode == :search
+      Grid.cancel_search
+    end
+  when ?!
+    Grid.debug
+  when ??
+    Grid.cursor_inspect
+  when Curses::KEY_BACKSPACE, 127
+    Grid.search(nil)
+  when String
+    Grid.search(k)
+  end
+end
+# require "pry"
+# Pry.start

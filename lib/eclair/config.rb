@@ -1,11 +1,19 @@
+require 'curses'
+
 module Eclair
+  module ConfigHelper
+    def config
+      Eclair.config
+    end
+  end
+  
   class Config
     KEYS_DIR = "#{ENV['HOME']}/.ecl/keys"
     CACHE_DIR = "#{ENV['HOME']}/.ecl/.cache"
 
-    def initialize opts
+    def initialize
       @done = false
-      @config_file = opts[:config] || ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
+      @config_file = ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
       @aws_region = nil
       @columns = 4
       @group_by = lambda do |instance|
@@ -83,8 +91,8 @@ module Eclair
 
   extend self
 
-  def init_config opts
-    @config = Config.new(opts)
+  def init_config
+    @config = Config.new
     load @config.config_file
     raise unless @done
     @config.after_load

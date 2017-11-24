@@ -1,3 +1,5 @@
+require 'curses'
+
 module Eclair
   module Color
     extend self
