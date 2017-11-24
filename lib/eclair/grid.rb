@@ -69,9 +69,10 @@ module Eclair
     end
 
     def action
-      Curses.close_screen
-
       targets = @provider.items.select{|i| i.selected}
+      return if targets.length == 0
+      
+      Curses.close_screen
 
       if targets.length == 1
         cmd = targets.first.command
@@ -198,7 +199,6 @@ module Eclair
         end
       end
     end
-
 
     def config
       Eclair.config
