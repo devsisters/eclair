@@ -1,12 +1,20 @@
 require "aws-sdk"
 require "eclair/provider"
-require "eclair/item"
 require "eclair/providers/ec2/ec2_item"
+require "eclair/providers/ec2/ec2_group_item"
 
 module Eclair
   module EC2Provider
     extend Provider
     extend self
+
+    def group_class
+      EC2GroupItem
+    end
+
+    def item_class
+      EC2Item
+    end
 
     def prepare
       Thread.abort_on_exception = true

@@ -6,6 +6,8 @@ module Eclair
   class Grid
     def initialize provider
       @provider = provider
+      @item_class = @provider.item_class
+      
       @grid = config.columns.times.map{[]}
       @scroll = config.columns.times.map{0}
       @header_rows = 4
@@ -14,7 +16,7 @@ module Eclair
       @maxy = Curses.stdscr.maxy - @header_rows
       @mode = :nav
 
-      provider.prepare
+      @provider.prepare
       assign
       at(*@cursor).toggle_select
       draw_all
@@ -50,6 +52,7 @@ module Eclair
       end
       draw(*prev)
       draw(*@cursor)
+      update_header(curr_item.header)
     end
 
     def space
@@ -58,7 +61,7 @@ module Eclair
         at(*@cursor).toggle_select
       end
       at(*@cursor).toggle_select
-      if @mode == :sel && provider.items.all?{|i| !i.selected}
+      if @mode == :sel && @provider.items.all?{|i| !i.selected}
         @mode = :nav
         at(*@cursor).toggle_select
       end
@@ -68,7 +71,7 @@ module Eclair
     def action
       Curses.close_screen
 
-      targets = provider.items.select{|i| i.selected}
+      targets = @provider.items.select{|i| i.selected}
 
       if targets.length == 1
         cmd = targets.first.command
@@ -110,6 +113,14 @@ module Eclair
     end
 
     private
+
+    def update_header str, pos = 0
+      str.split("\n").map(&:strip).each_with_index do |line, i|
+        Curses.setpos(i + pos,0)
+        Curses.clrtoeol
+        Curses.addstr(line)
+      end
+    end
     
     def rescroll x, y
       unless (@scroll[x]...@maxy+@scroll[x]).include? y
@@ -140,6 +151,7 @@ module Eclair
           draw_item(x,y)
         end
       end
+      update_header(at(*@cursor).header)
     end
     
     def color x, y
@@ -176,20 +188,17 @@ module Eclair
     end
 
     def assign
-      @groups = provider.items.group_by(&config.group_by)
+      @groups = @provider.items.group_by(&config.group_by)
       @groups.each do |name, items|
         group_name = "#{name} (#{items.length})"
         target = @grid.min_by(&:length)
-        target << GroupItem.new(group_name, items)
+        target << @provider.group_class.new(group_name, items)
         items.each do |item|
           target << item
         end
       end
     end
 
-    def provider
-      Eclair::EC2Provider
-    end
 
     def config
       Eclair.config

@@ -150,8 +150,8 @@ module Eclair
 
     def header
       <<-EOS
-      #{name} (#{instance_id}) [#{state[:name]}]
-      launched at #{launch_time.to_time}
+      #{name} (#{@instance.instance_id}) [#{instance.state[:name]}]
+      launched at #{instance.launch_time.to_time}
       EOS
     end
 
