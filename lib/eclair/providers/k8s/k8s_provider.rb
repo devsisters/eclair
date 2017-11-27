@@ -17,7 +17,7 @@ module Eclair
     end
 
     def prepare
-      pods = JSON.parse(`kubectl get pods #{config.get_pods_option} -o json`)["items"]
+      pods = Oj.load(`kubectl get pods #{config.get_pods_option} -o json`)["items"]
       @items = pods.map{|i| K8sItem.new(i)}
     end
 
