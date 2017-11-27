@@ -26,5 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "curses", "~> 1.0"
   spec.add_runtime_dependency "ruby-string-match-scorer", "~> 0.1"
   spec.add_runtime_dependency "pry", "~> 0.10"
+  spec.add_runtime_dependency "json", "~> 2.1"
   spec.add_runtime_dependency "oj", "~> 3.3"
 end
