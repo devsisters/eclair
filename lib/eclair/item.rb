@@ -19,7 +19,6 @@ module Eclair
     def config
       Eclair.config
     end
-
   end
 
   class Item

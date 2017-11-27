@@ -35,15 +35,9 @@ module Eclair
       @ssh_keys             = {}
       @ssh_ports            = [22].freeze
       @ssh_options          = "-o ConnectTimeout=1 -o StrictHostKeyChecking=no".freeze
-      @instance_color       = [Curses::COLOR_WHITE, -1].freeze
-      @group_color          = [Curses::COLOR_WHITE, -1, Curses::A_BOLD].freeze
-      @current_color        = [Curses::COLOR_BLACK, Curses::COLOR_CYAN].freeze
-      @selected_color       = [Curses::COLOR_YELLOW, -1, Curses::A_BOLD].freeze
-      @disabled_color       = [Curses::COLOR_BLACK, -1, Curses::A_BOLD].freeze
-      @search_color         = [Curses::COLOR_BLACK, Curses::COLOR_YELLOW].freeze
-      @help_color           = [Curses::COLOR_BLACK, Curses::COLOR_WHITE].freeze
       @dir_keys             = {}
       @exec_format          = "{ssh_command} {ssh_options} -p{port} {ssh_key} {username}@{host}"
+      @provider = :ec2
 
       instance_variables.each do |var|
         Config.class_eval do

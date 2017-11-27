@@ -8,8 +8,8 @@ module Eclair
     attr_reader :instance
     
     def initialize instance
+      super()
       @instance = instance
-      @selected = false
     end
 
     def id

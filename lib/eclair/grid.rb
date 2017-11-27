@@ -1,11 +1,19 @@
-require "eclair/providers/ec2"
+
+
 require "eclair/group_item"
 require "eclair/color"
 
 module Eclair
   class Grid
-    def initialize provider
-      @provider = provider
+    def initialize
+      case config.provider
+      when :ec2
+        require "eclair/providers/ec2"
+        @provider = EC2Provider
+      when :k8s
+        require "eclair/providers/k8s"
+        @provider = K8sProvider
+      end
       @item_class = @provider.item_class
       
       @grid = config.columns.times.map{[]}
