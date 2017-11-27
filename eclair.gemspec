@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "rake", "~> 12.3"
 
-  spec.add_runtime_dependency "aws-sdk", "~> 3.0"
+  spec.add_runtime_dependency "aws-sdk-ec2", "~> 1.18"
   spec.add_runtime_dependency "curses", "~> 1.0"
   spec.add_runtime_dependency "ruby-string-match-scorer", "~> 0.1"
   spec.add_runtime_dependency "pry", "~> 0.10"

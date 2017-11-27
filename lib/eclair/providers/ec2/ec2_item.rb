@@ -1,4 +1,4 @@
-require "aws-sdk"
+require "aws-sdk-ec2"
 
 require "eclair/item"
 require "eclair/providers/ec2/ec2_provider"
