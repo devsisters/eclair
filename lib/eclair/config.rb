@@ -37,7 +37,8 @@ module Eclair
       @ssh_options          = "-o ConnectTimeout=1 -o StrictHostKeyChecking=no".freeze
       @dir_keys             = {}
       @exec_format          = "{ssh_command} {ssh_options} -p{port} {ssh_key} {username}@{host}"
-      @provider = :ec2
+      @provider             = :ec2
+      @get_pods_option      = ""
 
       instance_variables.each do |var|
         Config.class_eval do

@@ -17,12 +17,17 @@ module Eclair
     end
 
     def prepare
-      pods = JSON.parse(`kubectl get pods -o json`)["items"]
+      pods = JSON.parse(`kubectl get pods #{config.get_pods_option} -o json`)["items"]
       @items = pods.map{|i| K8sItem.new(i)}
     end
 
     def items
       @items
+    end
+
+    private
+    def config
+      Eclair.config
     end
   end
 end
