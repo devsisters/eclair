@@ -114,6 +114,7 @@ module Eclair
     end
 
     def resize
+      Curses.clear
       @scroll.fill(0)
       @cell_width = Curses.stdscr.maxx/config.columns
       @maxy = Curses.stdscr.maxy - @header_rows
