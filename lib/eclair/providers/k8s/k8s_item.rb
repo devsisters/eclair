@@ -24,7 +24,7 @@ module Eclair
     end
 
     def command
-      "kubectl exec -ti #{@pod["metadata"]["name"]} /bin/sh"
+      "kubectl exec --namespace #{namespace} -ti #{name} /bin/sh"
     end
     
     def header
