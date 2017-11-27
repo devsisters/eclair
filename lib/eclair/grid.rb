@@ -110,7 +110,7 @@ module Eclair
         cmd = "tmux #{cmds.join(" \\; ")}"
       end
       system(cmd)
-      exit
+      resize
     end
 
     def resize
