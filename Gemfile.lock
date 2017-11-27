@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ecl (3.0.0.pre.alpha)
+    ecl (3.0.0.pre.alpha1)
       aws-sdk (~> 3.0)
       curses (~> 1.0)
       pry (~> 0.10)
