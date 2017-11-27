@@ -1,7 +1,7 @@
 require 'eclair/provider'
 require 'eclair/providers/k8s/k8s_item'
 require 'eclair/providers/k8s/k8s_group_item'
-require 'json'
+require 'oj'
 
 module Eclair
   module K8sProvider
