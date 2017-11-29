@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "eclair/config"
 
 module Eclair
@@ -15,7 +16,7 @@ module Eclair
     def search
       raise "Not Implemented"
     end
-    
+
     def config
       Eclair.config
     end
@@ -40,7 +41,7 @@ module Eclair
     def command
       raise "Not Implemented"
     end
-    
+
     def header
       raise "Not Implemented"
     end

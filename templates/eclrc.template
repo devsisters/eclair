@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 Eclair.configure do |config|
   # aws_region - AWS region to connect.
   # This overrides AWS_REGION environment variable, so you can comment out this line if you set this in environment variable.

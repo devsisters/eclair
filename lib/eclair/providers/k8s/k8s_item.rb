@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'eclair/item'
 require 'eclair/providers/k8s/k8s_provider'
 require 'time'
@@ -5,7 +6,7 @@ require 'time'
 module Eclair
   class K8sItem < Item
     attr_reader :pod
-    
+
     def initialize pod
       super()
       @pod = pod
@@ -26,7 +27,7 @@ module Eclair
     def command
       "kubectl exec --namespace #{namespace} -ti #{name} /bin/sh"
     end
-    
+
     def header
       <<-EOS
       #{name}
@@ -51,7 +52,7 @@ module Eclair
     def launch_time
       Time.parse(@pod["metadata"]["creationTimestamp"])
     end
-    
+
     def launched_at
       diff = Time.now - launch_time
       {
@@ -71,4 +72,3 @@ module Eclair
     end
   end
 end
-

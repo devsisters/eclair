@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'curses'
 
 module Eclair
@@ -6,7 +7,7 @@ module Eclair
       Eclair.config
     end
   end
-  
+
   class Config
     KEYS_DIR = "#{ENV['HOME']}/.ecl/keys"
     CACHE_DIR = "#{ENV['HOME']}/.ecl/.cache"

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "eclair/group_item"
 
 module Eclair
@@ -13,4 +14,3 @@ module Eclair
     end
   end
 end
-

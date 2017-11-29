@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "aws-sdk-ec2"
 require "eclair/provider"
 require "eclair/providers/ec2/ec2_item"
@@ -20,20 +21,20 @@ module Eclair
       Thread.abort_on_exception = true
 
       @instances ||= fetch_instances
-      
+
       image_ids = @instances.map(&:image_id).uniq
       @image_thread = Thread.new do
         @images = fetch_images(image_ids)
         @id_to_image = @images.map{|i| [i.image_id, i]}.to_h
       end
-      
+
       @sg_thread = Thread.new do
         @security_groups = fetch_security_groups
         @id_to_sg = @security_groups.map{|i| [i.group_id, i]}.to_h
       end
 
-      @vpc_thread = Thread.new do 
-        @vpcs = fetch_vpcs 
+      @vpc_thread = Thread.new do
+        @vpcs = fetch_vpcs
         @id_to_vpc = @vpcs.map{|i| [i.vpc_id, i]}.to_h
       end
 
@@ -95,19 +96,19 @@ module Eclair
     end
 
     def fetch_instances
-      ec2_client.describe_instances.map{ |resp| 
+      ec2_client.describe_instances.map{ |resp|
         resp.data.reservations.map do |rsv|
           rsv.instances
         end
       }.flatten
     end
-      
+
     def fetch_security_groups
       ec2_client.describe_security_groups.map{ |resp|
         resp.security_groups
       }.flatten
     end
-    
+
     def fetch_images image_ids
       ec2_client.describe_images(image_ids: image_ids).images.flatten
     end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Eclair
   module LessViewer
     extend self
