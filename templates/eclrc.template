@@ -8,13 +8,13 @@ Eclair.configure do |config|
   ## columns - Max number of columns displayed in eclair. (Default: 4)
   # config.columns = 4
 
-  ## ssh_username - Function to find username from image
-  ## You can use image data from EC2::Client#describe_images API call
+  ## ssh_username - Function to find username from image.
+  ## You can use image data from EC2::Client#describe_images API call.
   ## https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_images-instance_method
   config.ssh_username = lambda do |image|
     case image.name
 
-    ## Add your own configurations here
+    ## Add your own configurations here.
     # when /OpenVPN/
     #   "openvpnas"
 
@@ -45,9 +45,9 @@ Eclair.configure do |config|
   # }
 
   ## group_by - Function to find group name from instance.
-  ## Make a function that returns group name from instance data
+  ## Make a function that returns group name from instance data.
   ## You can access response data extracted from EC2::Client#describe_instances
-  ## API call
+  ## API call.
   ##
   ## https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_instances-instance_method
 
