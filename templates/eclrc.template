@@ -1,5 +1,12 @@
 # frozen_string_literal: true
+
+## Default configuration.
 Eclair.configure do |config|
+  ## provider - Cloud provider to connect.
+  ## You can use either AWS EC2 (:ec2) or Kubernetes (:k8s) with eclair. AWS
+  ## EC2 is used by default.
+  # config.provider = :ec2
+
   ## aws_region - AWS region to connect.
   ## This overrides AWS_REGION environment variable, so you can comment out this
   ## line if you set this in environment variable.
@@ -90,4 +97,18 @@ Eclair.configure do |config|
   ## exec_format - Format of the shell command which will be executed in the
   ## shell. (Default: "{ssh_command} {ssh_options} -p{port} {ssh_key} {username}@{host}")
   # config.exec_format = "echo 'hi' && {ssh_command} {ssh_options} -p{port} {ssh_key} {username}@{host}"
+end
+
+## Alternative configuration.
+##
+## You can easily switch between multiple configurations with 'ECL_PROFILE'
+## environment variable. To use 'k8s' configuration, execute eclair like below:
+##
+##     ECL_PROFILE=k8s ecl
+Eclair.configure "k8s" do |config|
+  config.provider = :k8s
+  config.get_pods_option = "--all-namespaces"
+  config.group_by = lambda do |item|
+    item.namespace
+  end
 end
