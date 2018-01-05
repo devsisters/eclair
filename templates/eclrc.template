@@ -10,7 +10,7 @@ Eclair.configure do |config|
   ## aws_region - AWS region to connect.
   ## This overrides AWS_REGION environment variable, so you can comment out this
   ## line if you set this in environment variable.
-  config.aws_region = "ap-northeast-1"
+  # config.aws_region = "ap-northeast-1"
 
   ## columns - Max number of columns displayed in eclair. (Default: 4)
   # config.columns = 4
