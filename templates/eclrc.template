@@ -58,24 +58,12 @@ Eclair.configure do |config|
   ##
   ## https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_instances-instance_method
 
-  ## If you want to group instances by security group, uncomment the example below. (Default behavior)
-  # config.group_by = lambda do |instance|
-  #   if instance.security_groups.first
-  #     instance.security_groups.first.group_name
+  ## By default, declair groups instances by VPC name.
+  # config.group_by = lambda do |item|
+  #   if item.vpc
+  #     item.vpc.tags.find { |x| x.key == "Name" } &.value
   #   else
-  #     "no_group"
-  #   end
-  # end
-
-  ## If you want to group instances by name, uncomment and edit the example below.
-  # config.group_by = lambda do |instance|
-  #   nametag = instance.tags.find{|t| t.key == "Name"}
-  #   return "Noname" unless nametag
-  #   case nametag.value
-  #   when /^production/
-  #     "production servers"
-  #   when /^test/
-  #     "test servers"
+  #     "NO VPC"
   #   end
   # end
 
