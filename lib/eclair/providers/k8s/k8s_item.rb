@@ -19,6 +19,8 @@ module Eclair
     def color
       if @selected
         [Curses::COLOR_YELLOW, -1, Curses::A_BOLD]
+      elsif !connectable?
+        [Curses::COLOR_BLACK, -1, Curses::A_BOLD]
       else
         [Curses::COLOR_WHITE, -1]
       end
@@ -46,8 +48,16 @@ module Eclair
     def name
       @pod["metadata"]["name"]
     end
+    
+    def connectable?
+      status == "running"
+    end
 
     private
+
+    def status
+      @pod["status"]["containerStatuses"].first["state"].keys.first
+    end
 
     def launch_time
       Time.parse(@pod["metadata"]["creationTimestamp"])

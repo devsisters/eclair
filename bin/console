@@ -34,25 +34,3 @@ loop do
     grid.action
   end
 end
-    # case Grid.mode
-    # when :search
-    #   Grid.end_search
-    # else
-    #   Grid.ssh
-    # end
-  # when 27
-  #   if Grid.mode == :search
-  #     Grid.cancel_search
-  #   end
-  # when ?!
-  #   Grid.debug
-  # when ??
-  #   Grid.cursor_inspect
-  # when Curses::KEY_BACKSPACE, 127
-  #   Grid.search(nil)
-  # when String
-  #   Grid.search(k)
-#   end
-# end
-# require "pry"
-# Pry.start

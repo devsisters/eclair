@@ -76,7 +76,7 @@ module Eclair
     end
 
     def action
-      targets = @provider.items.select{|i| i.selected}
+      targets = @provider.items.select{|i| i.selected && i.connectable?}
       return if targets.length == 0
 
       Curses.close_screen
@@ -109,7 +109,7 @@ module Eclair
         cmd = "tmux #{cmds.join(" \\; ")}"
       end
       system(cmd)
-      exit
+      resize
     end
 
     def resize
