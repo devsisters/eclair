@@ -202,7 +202,7 @@ module Eclair
         group_name = "#{name} (#{items.length})"
         target = @grid.min_by(&:length)
         target << @provider.group_class.new(group_name, items)
-        items.each do |item|
+        items.sort_by(&:label).each do |item|
           target << item
         end
       end
