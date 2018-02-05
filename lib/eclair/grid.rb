@@ -39,7 +39,11 @@ module Eclair
         Curses::KEY_RIGHT => [1,0],
       }[key]
 
-      newx = (x + mx) % @grid.length
+      newx = x
+      loop do
+        newx = (newx + mx) % @grid.length
+        break if @grid[newx].length > 0
+      end
       newy = (y + my - @scroll[x] + @scroll[newx])
       if my != 0
         newy %= @grid[newx].length
