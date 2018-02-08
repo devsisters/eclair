@@ -17,11 +17,11 @@ module Eclair
       @config_file = ENV["ECLRC"] || "#{ENV['HOME']}/.ecl/config.rb"
       @aws_region = nil
       @columns = 4
-      @group_by = lambda do |instance|
-        if instance.security_groups.first
-          instance.security_groups.first.group_name
+      @group_by = lambda do |item|
+        if item.vpc
+          item.vpc.tags.find { |x| x.key == "Name" } &.value
         else
-          "no_group"
+          "NO VPC"
         end
       end
       @ssh_username = lambda do |image|
