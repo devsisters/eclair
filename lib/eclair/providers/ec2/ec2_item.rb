@@ -90,8 +90,6 @@ module Eclair
       ![32, 48, 80].include?(@instance.state[:code])
     end
 
-    private
-
     def name
       return @name if @name
       begin
@@ -105,6 +103,8 @@ module Eclair
     def security_groups
       @security_groups ||= @instance.security_groups.map{|sg| provider.find_security_group_by_id(sg.group_id)}
     end
+
+    private
 
     def launched_at
       diff = Time.now - @instance.launch_time
