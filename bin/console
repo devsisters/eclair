@@ -26,8 +26,10 @@ loop do
   case k = Curses.stdscr.getch
   when Curses::KEY_RESIZE
     grid.resize
-  when Curses::KEY_LEFT, Curses::KEY_RIGHT, Curses::KEY_UP, Curses::KEY_DOWN
-    grid.move(k)
+  when "h", "H", Curses::KEY_LEFT ; grid.move(Curses::KEY_LEFT)
+  when "j", "J", Curses::KEY_RIGHT; grid.move(Curses::KEY_DOWN)
+  when "k", "K", Curses::KEY_UP   ; grid.move(Curses::KEY_UP)
+  when "l", "L", Curses::KEY_DOWN ; grid.move(Curses::KEY_RIGHT)
   when " "
     grid.space
   when 10
