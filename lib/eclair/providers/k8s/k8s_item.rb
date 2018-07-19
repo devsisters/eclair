@@ -26,8 +26,12 @@ module Eclair
       end
     end
 
+    def exec_command
+      @pod["metadata"]["labels"]["eclair_exec_command"] || "/bin/sh"
+    end
+
     def command
-      "kubectl exec --namespace #{namespace} -ti #{name} /bin/sh"
+      "kubectl exec --namespace #{namespace} -ti #{name} #{exec_command}"
     end
 
     def header
@@ -48,7 +52,7 @@ module Eclair
     def name
       @pod["metadata"]["name"]
     end
-    
+
     def connectable?
       status == "running"
     end
