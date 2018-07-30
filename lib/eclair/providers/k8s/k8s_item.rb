@@ -60,7 +60,7 @@ module Eclair
     private
 
     def status
-      @pod["status"]["containerStatuses"].first["state"].keys.first
+      @pod["status"]["containerStatuses"].first["state"].keys.first rescue nil
     end
 
     def launch_time
