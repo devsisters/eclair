@@ -12,23 +12,23 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    aws-eventstream (1.0.0)
-    aws-partitions (1.90.0)
-    aws-sdk-core (3.21.2)
+    aws-eventstream (1.0.1)
+    aws-partitions (1.97.0)
+    aws-sdk-core (3.24.0)
       aws-eventstream (~> 1.0)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-ec2 (1.34.0)
+    aws-sdk-ec2 (1.41.0)
       aws-sdk-core (~> 3)
       aws-sigv4 (~> 1.0)
-    aws-sigv4 (1.0.2)
+    aws-sigv4 (1.0.3)
     coderay (1.1.2)
     curses (1.2.4)
     jmespath (1.4.0)
     json (2.1.0)
     method_source (0.9.0)
-    oj (3.6.2)
+    oj (3.6.5)
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
@@ -44,4 +44,4 @@ DEPENDENCIES
   rake (~> 12.3)
 
 BUNDLED WITH
-   1.16.1
+   1.16.3
