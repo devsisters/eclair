@@ -17,10 +17,10 @@ module Eclair
       EC2Item
     end
 
-    def prepare
+    def prepare keyword
       Thread.abort_on_exception = true
 
-      @instances ||= fetch_instances
+      @instances ||= fetch_instances keyword
 
       image_ids = @instances.map(&:image_id).uniq
       @image_thread = Thread.new do
@@ -95,8 +95,10 @@ module Eclair
       @ec2_client ||= Aws::EC2::Client.new
     end
 
-    def fetch_instances
-      ec2_client.describe_instances.map{ |resp|
+    def fetch_instances keyword
+      filter = if keyword.empty? then {} else { filters: [{name: "tag:Name", values: ["*#{keyword}*"]}] } end
+
+      ec2_client.describe_instances(filter).map{ |resp|
         resp.data.reservations.map do |rsv|
           rsv.instances
         end

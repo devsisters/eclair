@@ -15,7 +15,11 @@ Curses.noecho
 Curses.curs_set(0)
 trap("INT") { exit }
 
-grid = Eclair::Grid.new
+if ARGV.empty?
+  grid = Eclair::Grid.new
+else
+  grid = Eclair::Grid.new(ARGV[0])
+end
 
 loop do
   case k = Curses.stdscr.getch

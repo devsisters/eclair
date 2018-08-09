@@ -4,7 +4,7 @@ require "eclair/color"
 
 module Eclair
   class Grid
-    def initialize
+    def initialize keyword = ""
       case config.provider
       when :ec2
         require "eclair/providers/ec2"
@@ -23,7 +23,7 @@ module Eclair
       @maxy = Curses.stdscr.maxy - @header_rows
       @mode = :nav
 
-      @provider.prepare
+      @provider.prepare keyword
       assign
       at(*@cursor).toggle_select
       draw_all

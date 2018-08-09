@@ -17,8 +17,8 @@ module Eclair
       K8sItem
     end
 
-    def prepare
-      pods = Oj.load(`kubectl get pods #{config.get_pods_option} -o json`)["items"]
+    def prepare keyword
+      pods = Oj.load(`kubectl get pods #{config.get_pods_option} -o json`)["items"].select{|i| i["metadata"]["name"].include? keyword or i["metadata"]["namespace"].include? keyword}
       @items = pods.map{|i| K8sItem.new(i)}
     end
 
