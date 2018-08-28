@@ -17,6 +17,23 @@ tmux
 $ gem install ecl
 ```
 
+### Install from Source
+
+To use the latest functionality use:
+(Note: Backwards compatibility is not supported)
+
+```console
+$ gem build eclair.gemspec
+  Successfully built RubyGem
+  Name: ecl
+
+$ gem install ecl-3.0.0.pre.alpha1.gem
+Successfully installed ecl-3.0.0.pre.alpha1
+Parsing documentation for ecl-3.0.0.pre.alpha1
+Done installing documentation for ecl after 0 seconds
+1 gem installed
+```
+
 ## Usage
 
 ```console
