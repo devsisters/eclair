@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'Shellwords'
 require "aws-sdk-ec2"
 
 require "eclair/item"
@@ -49,7 +50,7 @@ module Eclair
         end
       end.join(" || ")
       # puts joined_cmd
-      "echo Attaching to #{name} \\[#{@instance.instance_id}\\] && #{joined_cmd}"
+      "echo Attaching to #{Shellwords.escape(name)} \\[#{@instance.instance_id}\\] && #{joined_cmd}"
     end
 
     def header
