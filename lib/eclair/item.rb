@@ -2,26 +2,6 @@
 require "eclair/config"
 
 module Eclair
-  module Plugin
-    extend self
-
-    def items
-      raise "Not Implemented"
-    end
-
-    def groups
-      raise "Not Implemented"
-    end
-
-    def search
-      raise "Not Implemented"
-    end
-
-    def config
-      Eclair.config
-    end
-  end
-
   class Item
     include ConfigHelper
     attr_accessor :selected
@@ -47,6 +27,10 @@ module Eclair
     end
 
     def title
+      raise "Not Implemented"
+    end
+
+    def search_key
       raise "Not Implemented"
     end
   end

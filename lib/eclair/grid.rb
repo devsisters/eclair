@@ -4,6 +4,8 @@ require "eclair/color"
 
 module Eclair
   class Grid
+    attr_reader :mode
+
     def initialize keyword = ""
       case config.provider
       when :ec2
@@ -23,6 +25,9 @@ module Eclair
       @maxy = Curses.stdscr.maxy - @header_rows
       @mode = :nav
 
+      @search_buffer = ""
+      @search_matched = []
+
       @provider.prepare keyword
       assign
       at(*@cursor).toggle_select
@@ -30,7 +35,6 @@ module Eclair
     end
 
     def move key
-      prev = @cursor.dup
       x,y = @cursor
       mx,my = {
         Curses::KEY_UP => [0,-1],
@@ -52,18 +56,7 @@ module Eclair
         newy = @grid[newx].length-1
       end
 
-      @cursor = [newx, newy]
-
-      prev_item = at(*prev)
-      curr_item = at(*@cursor)
-      rescroll(*@cursor)
-      if @mode == :nav
-        prev_item.toggle_select
-        curr_item.toggle_select
-      end
-      draw(*prev)
-      draw(*@cursor)
-      update_header(curr_item.header)
+      move_cursor(newx, newy)
     end
 
     def space
@@ -126,7 +119,62 @@ module Eclair
       draw_all
     end
 
+    def start_search
+      @mode_prev = @mode
+      @mode = :search
+    end
+
+    def end_search
+      @mode = @mode_prev
+      move_next_search
+    end
+
+    def move_next_search
+      return if @search_matched.empty?
+      move_cursor(*@search_matched.bsearch { |pos| (pos <=> @cursor) == 1 } || @search_matched[0])
+    end
+
+    def move_prev_search
+      return if @search_matched.empty?
+      next_idx = @search_matched.bsearch_index { |pos| (pos <=> @cursor) != -1 } || 0
+      move_cursor(*@search_matched[next_idx - 1])
+    end
+
+    def append_search key
+      return if key == nil
+      if key == 127 # backspace
+        @search_buffer = @search_buffer[0...-1]
+      else
+        begin
+          @search_buffer = @search_buffer + key.to_s
+        rescue; end
+      end
+      update_search
+    end
+
+    def clear_search
+      @search_buffer = ""
+      update_search
+    end
+
     private
+
+    def move_cursor x, y
+      prev = @cursor.dup
+      @cursor = [x, y]
+
+      prev_item = at(*prev)
+      curr_item = at(*@cursor)
+      rescroll(*@cursor)
+      if @mode == :nav
+        prev_item.toggle_select
+        curr_item.toggle_select
+      end
+      draw(*prev)
+      draw(*@cursor)
+      update_header(curr_item.header)
+    end
+
 
     def update_header str, pos = 0
       str.split("\n").map(&:strip).each_with_index do |line, i|
@@ -134,6 +182,34 @@ module Eclair
         Curses.clrtoeol
         Curses.addstr(line)
       end
+    end
+
+    def update_search
+      old_matched = Set.new(@search_matched)
+      @search_matched = []
+
+      if not @search_buffer.empty?
+        @grid.each_with_index do |column, x|
+          column.each_with_index do |_, y|
+            if not at(x, y).is_a?(GroupItem) and at(x, y).search_key.include?(@search_buffer)
+              @search_matched << [x, y]
+            end
+          end
+        end
+      end
+
+      (old_matched | Set.new(@search_matched)).each do |x, y|
+        draw_item(x, y)
+      end
+
+      Curses.setpos(@header_rows - 1, 0)
+      Curses.clrtoeol
+      if @mode != :search && @search_buffer.empty?
+        Curses.addstr('/: Start search, n: go to next search, N: go to previous search')
+      else
+        Curses.addstr('/' + @search_buffer)
+      end
+
     end
 
     def rescroll x, y
@@ -154,7 +230,7 @@ module Eclair
     end
 
     def make_label target
-      ind = (@mode == :sel && target.selected) ? "*" : " "
+      ind = (@mode != :nav && target.selected) ? "*" : " "
       label = "#{target.label} #{ind}"
       label.slice(0, @cell_width).ljust(@cell_width)
     end
@@ -166,11 +242,14 @@ module Eclair
         end
       end
       update_header(at(*@cursor).header)
+      update_search
     end
 
     def color x, y
       if @cursor == [x,y]
         Color.fetch(Curses::COLOR_BLACK, Curses::COLOR_CYAN)
+      elsif @search_matched.include? [x,y]
+        Color.fetch(Curses::COLOR_BLACK, Curses::COLOR_YELLOW)
       else
         Color.fetch(*@grid[x][y].color)
       end

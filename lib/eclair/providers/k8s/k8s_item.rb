@@ -57,6 +57,10 @@ module Eclair
       status == "running"
     end
 
+    def search_key
+      name
+    end
+
     private
 
     def status

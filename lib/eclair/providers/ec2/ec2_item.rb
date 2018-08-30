@@ -105,6 +105,10 @@ module Eclair
       @security_groups ||= @instance.security_groups.map{|sg| provider.find_security_group_by_id(sg.group_id)}
     end
 
+    def search_key
+      name
+    end
+
     private
 
     def launched_at
