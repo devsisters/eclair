@@ -89,7 +89,7 @@ module Eclair
     end
 
     def launch_time
-      Time.parse(@instance["creationTimestamp"])
+      Time.parse(@instance["creationTimestamp"]).localtime
     end
 
     def launched_at
