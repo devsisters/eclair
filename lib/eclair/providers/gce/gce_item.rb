@@ -55,7 +55,7 @@ module Eclair
     end
 
     def command
-      hosts = [public_ip_address, private_ip_address].compact
+      hosts = [private_ip_address, public_ip_address].compact
       ports = config.ssh_ports
       ssh_options = config.ssh_options
       ssh_command = config.ssh_command
@@ -70,6 +70,7 @@ module Eclair
             "{port}"        => port,
             "{username}"    => username,
             "{host}"        => host,
+            "{ssh_key}"     => ""
           }.reduce(format) { |cmd,pair| cmd.sub(pair[0],pair[1].to_s) }
         end
       end.join(" || ")
