@@ -47,11 +47,11 @@ module Eclair
     end
 
     def public_ip_address
-      @instance["networkInterfaces"][0]["accessConfigs"][0]["natIP"]
+      @instance.dig("networkInterfaces", 0, "accessConfigs", 0, "natIP")
     end
 
     def private_ip_address
-      @instance["networkInterfaces"][0]["networkIP"]
+      @instance.dig("networkInterfaces", 0, "networkIP")
     end
 
     def command
