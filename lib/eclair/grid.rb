@@ -12,6 +12,9 @@ module Eclair
       when :k8s
         require "eclair/providers/k8s"
         @provider = K8sProvider
+      when :gce
+        require "eclair/providers/gce"
+        @provider = GCEProvider
       end
       @item_class = @provider.item_class
 
