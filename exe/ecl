@@ -35,12 +35,13 @@ loop do
     when 10 # enter
       grid.action
     when "/"
-      grid.clear_search
       grid.start_search
-    when "n"
-      grid.move_next_search
-    when "N"
-      grid.move_prev_search
+      grid.clear_search
+    when "!"
+      Curses.close_screen
+      require 'pry'
+      binding.pry
+      exit
     when 27 # escape
       grid.clear_search
     end

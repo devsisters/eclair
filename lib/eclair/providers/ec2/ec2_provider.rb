@@ -43,10 +43,6 @@ module Eclair
       @prepared = true
     end
 
-    def items
-      @items
-    end
-
     def image_loaded?
       !@sg_thread.alive?
     end

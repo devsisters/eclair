@@ -20,16 +20,13 @@ module Eclair
       end
       @item_class = @provider.item_class
 
-      @grid = config.columns.times.map{[]}
       @scroll = config.columns.times.map{0}
       @header_rows = 4
       @cursor = [0,0]
       @cell_width = Curses.stdscr.maxx/config.columns
       @maxy = Curses.stdscr.maxy - @header_rows
       @mode = :nav
-
       @search_buffer = ""
-      @search_matched = []
 
       @provider.prepare keyword
       assign
@@ -38,6 +35,7 @@ module Eclair
     end
 
     def move key
+      return unless at(*@cursor)
       x,y = @cursor
       mx,my = {
         Curses::KEY_UP => [0,-1],
@@ -64,21 +62,23 @@ module Eclair
 
     def space
       if @mode == :nav
-        @mode = :sel
-        at(*@cursor).toggle_select
+        transit_state(:sel)
       end
-      at(*@cursor).toggle_select
+
+      at(*@cursor)&.toggle_select
+
       if @mode == :sel && @provider.items.all?{|i| !i.selected}
-        @mode = :nav
-        at(*@cursor).toggle_select
+        transit_state(:nav)
       end
+
+
       draw(*@cursor)
     end
 
     def action
       targets = @provider.items.select{|i| i.selected && i.connectable?}
-      return if targets.length == 0
 
+      return if targets.empty?
       Curses.close_screen
 
       if targets.length == 1
@@ -122,41 +122,60 @@ module Eclair
       draw_all
     end
 
+    def transit_state to
+      return if to == @mode
+      case @mode
+      when :nav
+        at(*@cursor)&.select(false)
+      when :sel
+      when :search
+      end
+
+      @mode = to
+
+      case @mode
+      when :nav
+        at(*@cursor)&.select(true)
+      when :sel
+      when :search
+        move_cursor(0,0)
+      end
+
+      draw_all
+    end
+
     def start_search
-      @mode_prev = @mode
-      @mode = :search
+      transit_state(:search)
     end
 
     def end_search
-      @mode = @mode_prev
-      move_next_search
-    end
-
-    def move_next_search
-      return if @search_matched.empty?
-      move_cursor(*@search_matched.bsearch { |pos| (pos <=> @cursor) == 1 } || @search_matched[0])
-    end
-
-    def move_prev_search
-      return if @search_matched.empty?
-      next_idx = @search_matched.bsearch_index { |pos| (pos <=> @cursor) != -1 } || 0
-      move_cursor(*@search_matched[next_idx - 1])
-    end
-
-    def append_search key
-      return if key == nil
-      if key == 127 # backspace
-        @search_buffer = @search_buffer[0...-1]
+      if @provider.items.any?{|i| i.selected}
+        transit_state(:sel)
       else
-        begin
-          @search_buffer = @search_buffer + key.to_s
-        rescue; end
+        transit_state(:nav)
       end
-      update_search
     end
 
     def clear_search
       @search_buffer = ""
+      update_search
+    end
+
+    def append_search key
+      return unless key
+
+      if @search_buffer.length > 0 && key == 127 # backspace
+        @search_buffer = @search_buffer.chop
+      elsif key.to_s.length == 1
+        begin
+          @search_buffer = @search_buffer + key.to_s
+        rescue
+          return
+        end
+      else
+        return
+      end
+
       update_search
     end
 
@@ -173,46 +192,35 @@ module Eclair
         prev_item.toggle_select
         curr_item.toggle_select
       end
-      draw(*prev)
-      draw(*@cursor)
-      update_header(curr_item.header)
+      draw(*prev) if prev_item
+      draw(*@cursor) if curr_item
+      update_header(curr_item.header) if curr_item
     end
 
 
     def update_header str, pos = 0
+      Curses.setpos(0, 0)
+      Curses.clrtoeol
+      Curses.addstr(@mode.to_s)
       str.split("\n").map(&:strip).each_with_index do |line, i|
-        Curses.setpos(i + pos,0)
+        Curses.setpos(i + pos + 1, 0)
         Curses.clrtoeol
         Curses.addstr(line)
       end
     end
 
     def update_search
-      old_matched = Set.new(@search_matched)
-      @search_matched = []
-
-      if not @search_buffer.empty?
-        @grid.each_with_index do |column, x|
-          column.each_with_index do |_, y|
-            if not at(x, y).is_a?(GroupItem) and at(x, y).search_key.include?(@search_buffer)
-              @search_matched << [x, y]
-            end
-          end
-        end
-      end
-
-      (old_matched | Set.new(@search_matched)).each do |x, y|
-        draw_item(x, y)
-      end
+      assign
+      Curses.clear
+      draw_all
 
       Curses.setpos(@header_rows - 1, 0)
       Curses.clrtoeol
       if @mode != :search && @search_buffer.empty?
-        Curses.addstr('/: Start search, n: go to next search, N: go to previous search')
+        update_header('/: Start search')
       else
-        Curses.addstr('/' + @search_buffer)
+        update_header("/#{@search_buffer}")
       end
-
     end
 
     def rescroll x, y
@@ -244,22 +252,23 @@ module Eclair
           draw_item(x,y)
         end
       end
+      case @mode
+      when :nav, :sel
       update_header(at(*@cursor).header)
-      update_search
+      end
+      # update_search
     end
 
     def color x, y
       if @cursor == [x,y]
         Color.fetch(Curses::COLOR_BLACK, Curses::COLOR_CYAN)
-      elsif @search_matched.include? [x,y]
-        Color.fetch(Curses::COLOR_BLACK, Curses::COLOR_YELLOW)
       else
         Color.fetch(*@grid[x][y].color)
       end
     end
 
     def draw_item x, y
-      target = @grid[x][y]
+      target = @grid[x].select{|item| item.visible}[y]
 
       drawy = y - @scroll[x]
       if drawy < 0 || drawy + @header_rows >= Curses.stdscr.maxy
@@ -284,7 +293,9 @@ module Eclair
     end
 
     def assign
-      @groups = @provider.items.group_by(&config.group_by)
+      @grid = config.columns.times.map{[]}
+      visible_items = @provider.filter_items(@search_buffer)
+      @groups = visible_items.group_by(&config.group_by)
       @groups.each do |name, items|
         group_name = "#{name} (#{items.length})"
         target = @grid.min_by(&:length)

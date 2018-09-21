@@ -86,7 +86,7 @@ module Eclair
         security_groups: provider.security_group_loaded? ? security_groups : "sg info not loaded yet",
       }
     end
-    
+
     def connectable?
       ![32, 48, 80].include?(@instance.state[:code])
     end
