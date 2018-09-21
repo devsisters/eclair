@@ -25,13 +25,14 @@ module Eclair
       @cursor = [0,0]
       @cell_width = Curses.stdscr.maxx/config.columns
       @maxy = Curses.stdscr.maxy - @header_rows
-      @mode = :nav
+      @mode = :assign
       @search_buffer = ""
 
       @provider.prepare keyword
       assign
-      at(*@cursor).toggle_select
+      at(*@cursor).select(true)
       draw_all
+      transit_mode(:nav)
     end
 
     def move key
@@ -62,13 +63,13 @@ module Eclair
 
     def space
       if @mode == :nav
-        transit_state(:sel)
+        transit_mode(:sel)
       end
 
       at(*@cursor)&.toggle_select
 
       if @mode == :sel && @provider.items.all?{|i| !i.selected}
-        transit_state(:nav)
+        transit_mode(:nav)
       end
 
 
@@ -122,13 +123,15 @@ module Eclair
       draw_all
     end
 
-    def transit_state to
+    def transit_mode to
       return if to == @mode
+
       case @mode
       when :nav
         at(*@cursor)&.select(false)
       when :sel
       when :search
+      when :assign
       end
 
       @mode = to
@@ -138,6 +141,7 @@ module Eclair
         at(*@cursor)&.select(true)
       when :sel
       when :search
+      when :assign
         move_cursor(0,0)
       end
 
@@ -145,14 +149,14 @@ module Eclair
     end
 
     def start_search
-      transit_state(:search)
+      transit_mode(:search)
     end
 
     def end_search
       if @provider.items.any?{|i| i.selected}
-        transit_state(:sel)
+        transit_mode(:sel)
       else
-        transit_state(:nav)
+        transit_mode(:nav)
       end
     end
 
@@ -189,8 +193,8 @@ module Eclair
       curr_item = at(*@cursor)
       rescroll(*@cursor)
       if @mode == :nav
-        prev_item.toggle_select
-        curr_item.toggle_select
+        prev_item.select(false)
+        curr_item.select(true)
       end
       draw(*prev) if prev_item
       draw(*@cursor) if curr_item
@@ -254,9 +258,8 @@ module Eclair
       end
       case @mode
       when :nav, :sel
-      update_header(at(*@cursor).header)
+        update_header(at(*@cursor)&.header || "No Match")
       end
-      # update_search
     end
 
     def color x, y
@@ -293,6 +296,8 @@ module Eclair
     end
 
     def assign
+      old_mode = @mode
+      transit_mode(:assign)
       @grid = config.columns.times.map{[]}
       visible_items = @provider.filter_items(@search_buffer)
       @groups = visible_items.group_by(&config.group_by)
@@ -304,6 +309,7 @@ module Eclair
           target << item
         end
       end
+      transit_mode(old_mode)
     end
 
     def config
