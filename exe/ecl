@@ -12,7 +12,7 @@ Curses.start_color
 Curses.use_default_colors
 Curses.crmode
 Curses.noecho
-Curses.curs_set(0)
+Curses.ESCDELAY = 25
 trap("INT") { exit }
 
 if ARGV.empty?
@@ -22,14 +22,41 @@ else
 end
 
 loop do
-  case k = Curses.stdscr.getch
-  when Curses::KEY_RESIZE
-    grid.resize
-  when Curses::KEY_LEFT, Curses::KEY_RIGHT, Curses::KEY_UP, Curses::KEY_DOWN
-    grid.move(k)
-  when " "
-    grid.space
-  when 10
-    grid.action
+  case grid.mode
+  when :nav, :sel
+    Curses.curs_set(0)
+    case k = Curses.stdscr.getch
+    when Curses::KEY_RESIZE
+      grid.resize
+    when Curses::KEY_LEFT, Curses::KEY_RIGHT, Curses::KEY_UP, Curses::KEY_DOWN
+      grid.move(k)
+    when " "
+      grid.space
+    when 10 # enter
+      grid.action
+    when "/"
+      grid.start_search
+      grid.clear_search
+    when "!"
+      Curses.close_screen
+      require 'pry'
+      binding.pry
+      exit
+    when 27 # escape
+      grid.clear_search
+    end
+  when :search
+    Curses.curs_set(1)
+    case k = Curses.stdscr.getch
+    when Curses::KEY_RESIZE
+      grid.resize
+    when 10 # enter
+      grid.end_search
+    when 27 # escape
+      grid.clear_search
+      grid.end_search
+    else
+      grid.append_search(k)
+    end
   end
 end

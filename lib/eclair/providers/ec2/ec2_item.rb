@@ -86,7 +86,7 @@ module Eclair
         security_groups: provider.security_group_loaded? ? security_groups : "sg info not loaded yet",
       }
     end
-    
+
     def connectable?
       ![32, 48, 80].include?(@instance.state[:code])
     end
@@ -103,6 +103,10 @@ module Eclair
 
     def security_groups
       @security_groups ||= @instance.security_groups.map{|sg| provider.find_security_group_by_id(sg.group_id)}
+    end
+
+    def search_key
+      name
     end
 
     private
