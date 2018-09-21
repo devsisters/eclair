@@ -58,7 +58,7 @@ module Eclair
     end
 
     def search_key
-      name
+      name.downcase
     end
 
     private

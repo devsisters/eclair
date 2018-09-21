@@ -5,7 +5,7 @@ module Eclair
     attr_accessor :items
 
     def filter_items search_buffer
-      @items.select{ |item| item&.search_key&.include?(search_buffer) || item.selected }
+      @items.select{ |item| item&.search_key&.include?(search_buffer.downcase) || item.selected }
     end
 
     def require_prepare
