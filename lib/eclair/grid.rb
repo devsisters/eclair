@@ -40,9 +40,13 @@ module Eclair
       x,y = @cursor
       mx,my = {
         Curses::KEY_UP => [0,-1],
+        ?k => [0,-1],
         Curses::KEY_DOWN => [0,1],
+        ?j => [0,1],
         Curses::KEY_LEFT => [-1,0],
+        ?h => [-1,0],
         Curses::KEY_RIGHT => [1,0],
+        ?l => [1,0],
       }[key]
 
       newx = x

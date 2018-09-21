@@ -28,7 +28,7 @@ loop do
     case k = Curses.stdscr.getch
     when Curses::KEY_RESIZE
       grid.resize
-    when Curses::KEY_LEFT, Curses::KEY_RIGHT, Curses::KEY_UP, Curses::KEY_DOWN
+    when Curses::KEY_LEFT, Curses::KEY_RIGHT, Curses::KEY_UP, Curses::KEY_DOWN, ?h, ?j, ?k, ?l
       grid.move(k)
     when " "
       grid.space
@@ -41,6 +41,8 @@ loop do
       Curses.close_screen
       require 'pry'
       binding.pry
+      exit
+    when ?q
       exit
     when 27 # escape
       grid.clear_search
