@@ -100,9 +100,7 @@ Group by instance name.
 
 ```ruby
 config.group_by = lambda do |instance|
-  nametag = instance.tags.find{|t| t.key == "Name"}
-  return "Noname" unless nametag
-  case nametag.value
+  case instance.name
   when /^production/
     "production servers"
   when /^test/
