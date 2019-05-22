@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'Shellwords'
+require 'shellwords'
 require "aws-sdk-ec2"
 
 require "eclair/item"
