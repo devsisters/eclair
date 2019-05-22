@@ -1,4 +1,4 @@
-# Eclair
+# eclair
 
 ![eclair gif](out.gif)
 
@@ -9,6 +9,13 @@ Simple ssh helper for Amazon EC2
 ```
 tmux
 ~/.aws/credentials (created by AWS CLI)
+```
+
+If you are using Linux (or WSL), you may need the following additional components:
+
+```
+libncurses5-dev
+ruby-dev
 ```
 
 ## Installation
