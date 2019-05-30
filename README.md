@@ -11,8 +11,11 @@ Requirements
 
 Installation
 --------
-```console
-$ gem install ecl
+```bash
+gem install ecl
+
+# If you want to install alpha release:
+gem install ecl --pre
 ```
 
 ### Install from Source
