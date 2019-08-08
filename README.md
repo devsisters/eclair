@@ -4,39 +4,21 @@ eclair [![RubyGems total downloads]][RubyGems]
 
 Simple ssh helper for Amazon EC2
 
-Requirements
---------
+```bash
+gem install ecl
+```
+
+### Requirements
 - tmux > 2.0
 - Properly configured `~/.aws/credentials`
 
-Installation
---------
-```bash
-gem install ecl
-
-# If you want to install alpha release:
-gem install ecl --pre
-```
-
-### Install from Source
-If you want to use the latest functionalities, install Eclair from the source.
-```bash
-# Headers of ncursesw is required to build Eclair in GNU/Linux
-sudo apt-get install libncursesw5-dev   # Debian, Ubuntu, etc
-sudo yum install libncursesw5-devel     # CentOS, etc
-
-# Build latest eclair gem
-gem build eclair.gemspec
-
-# Install eclair into your system
-gem install ecl-3.0.0.pre.alpha1.gem
-```
-
-## Usage
+### Usage
 ```console
 $ ecl
 ```
 First execution will create `~/.ecl/config.rb` file. Edit this file and run again.
+
+&nbsp;
 
 Configurations
 --------
@@ -128,13 +110,32 @@ config.ssh_keys = {
 }
 ```
 
-License
+&nbsp;
+
+Install from Source
 --------
-The gem is available as open source under the terms of the [MIT License].
+If you want to use the latest functionalities, install Eclair from the source.
+```bash
+# Headers of ncursesw is required to build Eclair in GNU/Linux
+sudo apt-get install libncursesw5-dev   # Debian, Ubuntu, etc
+sudo yum install libncursesw5-devel     # CentOS, etc
+
+# Build latest eclair gem
+gem build eclair.gemspec
+
+# Install eclair into your system
+gem install ecl-3.0.0.gem
+```
+
+&nbsp;
+
+--------
+
+*eclair* is primarily distributed under the terms of the [MIT License].
 
 [RubyGems]: https://rubygems.org/gems/ecl
 [RubyGems total downloads]: https://badgen.net/rubygems/dt/ecl
 [A video showing how Eclair works]: out.gif
 [EC2::Client#describe_images]: https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_images-instance_method
 [EC2::Client#describe_instances]: https://docs.aws.amazon.com/AWSRubySDK/latest/AWS/EC2/Client.html#describe_instances-instance_method
-[MIT License]: http://opensource.org/licenses/MIT
+[MIT License]: LICENSE
