@@ -124,7 +124,7 @@ sudo yum install libncursesw5-devel     # CentOS, etc
 gem build eclair.gemspec
 
 # Install eclair into your system
-gem install ecl-3.0.0.gem
+gem install ecl-3.0.1.gem
 ```
 
 &nbsp;
