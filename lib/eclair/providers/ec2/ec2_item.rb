@@ -70,7 +70,7 @@ module Eclair
 
     def header
       <<-EOS
-      #{name} (#{@instance.instance_id}) [#{@instance.state[:name]}]
+      #{name} (#{@instance.instance_id}) [#{@instance.state[:name]}] #{@instance.private_ip_address}
       launched at #{@instance.launch_time.to_time}
       EOS
     end
