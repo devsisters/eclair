@@ -53,13 +53,6 @@ module Eclair
       "echo Attaching to #{Shellwords.escape(name)} \\[#{@instance.instance_id}\\] && #{joined_cmd}"
     end
 
-    def header
-      <<-EOS
-      #{name} (#{instance_id}) [#{state[:name]}]
-      launched at #{launch_time.to_time}
-      EOS
-    end
-
     def image
       @image ||= provider.find_image_by_id(@instance.image_id)
     end
