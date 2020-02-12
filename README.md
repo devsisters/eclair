@@ -110,6 +110,17 @@ config.ssh_keys = {
 }
 ```
 
+### filter by vpc_id
+Boolean variable. If ture use VPC_ID Environment variable for filtering EC2 instances.
+```ruby
+config.use_vpc_id_env = true
+```
+
+Example VPC_ID variable:
+```
+VPC_ID=vpc-12345678901234567
+```
+
 &nbsp;
 
 Install from Source

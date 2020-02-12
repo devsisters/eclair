@@ -1,6 +1,10 @@
 # frozen_string_literal: true
+require "eclair/config"
+
 module Eclair
   module Provider
+    include ConfigHelper
+
     extend self
     attr_accessor :items
 
