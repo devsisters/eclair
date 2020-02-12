@@ -172,7 +172,7 @@ module Eclair
     def append_search key
       return unless key
 
-      if @search_buffer.length > 0 && key == 127 # backspace
+      if @search_buffer.length > 0 && key == 127 || key == Curses::KEY_BACKSPACE || key == 8 #backspace
         @search_buffer = @search_buffer.chop
       elsif key.to_s.length == 1
         begin
