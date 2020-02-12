@@ -93,6 +93,13 @@ module Eclair
 
     def fetch_instances keyword
       filter = if keyword.empty? then {} else { filters: [{name: "tag:Name", values: ["*#{keyword}*"]}] } end
+      if config.use_vpc_id_env then
+        if filter.empty? then
+          filter = { filters: [{name: "vpc-id", values: [ENV['VPC_ID']]}] }
+        else
+          filter[:filters].push({name: "vpc-id", values: [ENV['VPC_ID']]})
+        end
+     end
 
       ec2_client.describe_instances(filter).map{ |resp|
         resp.data.reservations.map do |rsv|
