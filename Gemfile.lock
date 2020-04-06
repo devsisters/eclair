@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ecl (3.0.2)
+    ecl (3.0.3)
       aws-sdk-ec2 (~> 1.18)
       curses (~> 1.0)
       json (~> 2.1)
