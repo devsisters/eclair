@@ -110,7 +110,9 @@ config.ssh_keys = {
 }
 ```
 
-### filter by vpc_id
+### use_vpc_id_env (Experimental)
+_This Feature is experimental and subject to change in future versions_ 
+
 Boolean variable. If true use VPC_ID Environment variable for filtering EC2 instances.
 ```ruby
 config.use_vpc_id_env = true
