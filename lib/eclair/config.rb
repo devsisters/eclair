@@ -53,7 +53,7 @@ module Eclair
       new_dir = "#{ENV['HOME']}/.ecl"
       new_conf  = "#{ENV['HOME']}/.ecl/config.rb"
 
-      if !File.exists?(new_conf) && File.exists?(old_conf)
+      if !File.exist?(new_conf) && File.exist?(old_conf)
         FileUtils.mkdir_p new_dir
         FileUtils.mv old_conf, new_conf
         puts "#{old_conf} migrated to #{new_conf}"
@@ -61,7 +61,7 @@ module Eclair
         exit
       end
 
-      unless File.exists? @config_file
+      unless File.exist? @config_file
         template_path = File.join(File.dirname(__FILE__), "..", "..", "templates", "eclrc.template")
         FileUtils.mkdir_p(File.dirname(@config_file))
         FileUtils.cp(template_path, @config_file)
@@ -70,8 +70,8 @@ module Eclair
       end
 
       key_path = "#{new_dir}/keys"
-      FileUtils.mkdir_p key_path unless Dir.exists? key_path
-      # FileUtils.mkdir_p CACHE_DIR unless Dir.exists? CACHE_DIR
+      FileUtils.mkdir_p key_path unless Dir.exist? key_path
+      # FileUtils.mkdir_p CACHE_DIR unless Dir.exist? CACHE_DIR
     end
 
     def after_load
