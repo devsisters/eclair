@@ -119,12 +119,23 @@ module Eclair
     end
 
     def resize
-      Curses.clear
-      @scroll.fill(0)
-      @cell_width = Curses.stdscr.maxx/config.columns
-      @maxy = Curses.stdscr.maxy - @header_rows
-      rescroll(*@cursor)
-      draw_all
+      begin
+        Curses.clear
+        @scroll.fill(0)
+        @cell_width = Curses.stdscr.maxx/config.columns
+        @maxy = Curses.stdscr.maxy - @header_rows
+        rescroll(*@cursor)
+        draw_all
+      rescue => e
+        log_error(e)
+      end
+    end
+
+    def log_error(error)
+      File.open("error.log", "a") do |file|
+        file.puts("#{Time.now}: #{error.message}")
+        file.puts(error.backtrace)
+      end
     end
 
     def transit_mode to
