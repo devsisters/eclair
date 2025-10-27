@@ -44,6 +44,12 @@ loop do
       exit
     when ?q
       exit
+    when ?g
+      # Single 'g' press - go to first
+      grid.jump_to_first
+    when ?G
+      # Shift+G - go to end
+      grid.jump_to_end
     when 27 # escape
       grid.clear_search
     end

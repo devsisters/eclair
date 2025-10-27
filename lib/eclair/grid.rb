@@ -65,6 +65,20 @@ module Eclair
       move_cursor(newx, newy)
     end
 
+    def jump_to_first
+      return unless at(*@cursor)
+      x = @cursor[0]
+      return if @grid[x].empty?
+      move_cursor(x, 0)
+    end
+
+    def jump_to_end
+      return unless at(*@cursor)
+      x = @cursor[0]
+      return if @grid[x].empty?
+      move_cursor(x, @grid[x].length - 1)
+    end
+
     def space
       if @mode == :nav
         transit_mode(:sel)
