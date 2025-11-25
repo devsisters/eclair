@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ecl (3.0.4)
+    ecl (3.0.3)
       aws-sdk-ec2 (~> 1.18)
       curses (~> 1.0)
       json (~> 2.1)
@@ -42,16 +42,16 @@ GEM
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    rake (13.0.1)
+    rake (13.3.1)
     ruby-string-match-scorer (0.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 2.0)
+  bundler (>= 2.0)
   ecl!
   rake (~> 13.0)
 
 BUNDLED WITH
-  2.7.2
+  4.0.0.beta1
