@@ -14,13 +14,14 @@ Gem::Specification.new do |spec|
   spec.description   = %q{Simple ssh helper for Amazon EC2}
   spec.homepage      = "https://github.com/devsisters/eclair"
   spec.license       = "MIT"
+  spec.required_ruby_version = ">= 3.0.0"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 2.0"
+  spec.add_development_dependency "bundler", ">= 2.0"
   spec.add_development_dependency "rake", "~> 13.0"
 
   spec.add_runtime_dependency "aws-sdk-ec2", "~> 1.18"
